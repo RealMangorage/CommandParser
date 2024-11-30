@@ -4,6 +4,7 @@ import org.mangorage.cmd.core.argument.IArgumentType;
 import org.mangorage.cmd.core.argument.ParseResult;
 
 import java.util.Map;
+import java.util.Optional;
 
 public final class CommandSourceStack {
 
@@ -31,6 +32,14 @@ public final class CommandSourceStack {
         ParseResult<O> result = parser.parse(remaining);
         this.remaining = result.getRemaining();
         return result.getResult();
+    }
+
+    public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser) {
+        try {
+            return Optional.of(getParameter(id, parser));
+        } catch (Throwable e) {
+            return Optional.empty();
+        }
     }
 
     public String[] getArgs() {

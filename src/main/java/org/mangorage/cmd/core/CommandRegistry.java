@@ -48,7 +48,7 @@ public final class CommandRegistry<C, R> {
                             Util.literal()
                                     .executes((a, b) -> {
                                         System.out.println("Added " + b.getParameter("seconds", ArgumentTypes.INT));
-                                        System.out.println("Unit " + b.getParameter("unit", ArgumentTypes.INT));
+                                        System.out.println("Unit " + b.getOptionalParameter("unit", ArgumentTypes.INT).orElse(0));
                                         System.out.println("Who Executed " + a.player());
                                         return CommandResult.PASS;
                                     })
@@ -67,7 +67,7 @@ public final class CommandRegistry<C, R> {
                             "time",
                             "add",
                             "10900",
-                            "90"
+                            "1"
                     )
             );
 
