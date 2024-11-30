@@ -1,6 +1,7 @@
 package org.mangorage.cmd.core;
 
-import org.mangorage.cmd.core.context.Context;
+import org.mangorage.cmd.core.argument.IArgumentType;
+import org.mangorage.cmd.core.context.CommandSourceStack;
 import org.mangorage.cmd.Util;
 
 import java.util.HashMap;
@@ -12,11 +13,11 @@ public final class Command<C, R> {
         return new Builder<>();
     }
 
-    private final BiFunction<C, Context, R> onExecute;
+    private final BiFunction<C, CommandSourceStack, R> onExecute;
     private final Map<String, Command<C, R>> subCommands;
     private final Map<String, IArgumentType<?>> parameters;
 
-    private Command(final BiFunction<C, Context, R> onExecute, Map<String, Command<C, R>> subCommands, Map<String, IArgumentType<?>> parameters) {
+    private Command(final BiFunction<C, CommandSourceStack, R> onExecute, Map<String, Command<C, R>> subCommands, Map<String, IArgumentType<?>> parameters) {
         this.onExecute = onExecute;
         this.subCommands = subCommands;
         this.parameters = parameters;
@@ -28,12 +29,12 @@ public final class Command<C, R> {
             if (subCommand != null)
                 return subCommand.execute(
                         globalContext,
-                        Util.popArray(args)
+                        Util.shrinkArray(args)
                 );
             else
                 return onExecute.apply(
                         globalContext,
-                        Context.of(
+                        CommandSourceStack.of(
                                 parameters,
                                 args
                         )
@@ -41,7 +42,7 @@ public final class Command<C, R> {
         } else {
             return onExecute.apply(
                     globalContext,
-                    Context.of(
+                    CommandSourceStack.of(
                             parameters,
                             args
                     )
@@ -50,11 +51,13 @@ public final class Command<C, R> {
     }
 
     public static final class Builder<C, R> {
-        private BiFunction<C, Context, R> onExecute;
+        private BiFunction<C, CommandSourceStack, R> onExecute;
         private final Map<String, Command<C, R>> subCommands = new HashMap<>();
         private final Map<String, IArgumentType<?>> parameters = new HashMap<>();
 
-        public Builder<C, R> executes(BiFunction<C, Context, R> onExecute) {
+        private Builder() {}
+
+        public Builder<C, R> executes(BiFunction<C, CommandSourceStack, R> onExecute) {
             this.onExecute = onExecute;
             return this;
         }

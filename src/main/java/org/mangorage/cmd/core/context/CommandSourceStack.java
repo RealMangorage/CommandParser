@@ -1,21 +1,24 @@
 package org.mangorage.cmd.core.context;
 
-import org.mangorage.cmd.core.IArgumentType;
+import org.mangorage.cmd.core.argument.IArgumentType;
+import org.mangorage.cmd.core.argument.ParseResult;
 
 import java.util.Map;
 
-public final class Context {
+public final class CommandSourceStack {
 
-    public static Context of(Map<String, IArgumentType<?>> parameters, String[] args) {
-        return new Context(parameters, args);
+    public static CommandSourceStack of(Map<String, IArgumentType<?>> parameters, String[] args) {
+        return new CommandSourceStack(parameters, args);
     }
 
     private final Map<String, IArgumentType<?>> parameters;
     private final String[] args;
+    private String[] remaining;
 
-    private Context(Map<String, IArgumentType<?>> parameters, String[] args) {
+    private CommandSourceStack(Map<String, IArgumentType<?>> parameters, String[] args) {
         this.parameters = parameters;
         this.args = args;
+        this.remaining = args;
     }
 
     public <O> O getParameter(String id, IArgumentType<O> parser) {
@@ -25,10 +28,16 @@ public final class Context {
         if (actualType != parser)
             throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getType(), actualType.getType()));
 
-        return parser.parse(args);
+        ParseResult<O> result = parser.parse(remaining);
+        this.remaining = result.getRemaining();
+        return result.getResult();
     }
 
     public String[] getArgs() {
         return args;
+    }
+
+    public String[] getRemaining() {
+        return remaining;
     }
 }

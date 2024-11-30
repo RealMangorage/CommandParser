@@ -2,7 +2,7 @@ package org.mangorage.cmd.core;
 
 import org.mangorage.cmd.Util;
 import org.mangorage.cmd.core.context.CommandResult;
-import org.mangorage.cmd.core.impl.ArgumentTypes;
+import org.mangorage.cmd.core.argument.ArgumentTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public final class CommandRegistry<C, R> {
         if (args.length >= 1) {
             var cmd = commandMap.get(args[0]);
             if (cmd != null)
-                return cmd.execute(globalContext, Util.popArray(args));
+                return cmd.execute(globalContext, Util.shrinkArray(args));
         }
         return defaultReturn;
     }
@@ -37,34 +37,37 @@ public final class CommandRegistry<C, R> {
         return execute(globalContext, command.split(" "));
     }
 
-    record GlobalContext(String player) {}
+    public record GlobalContext(String player) {}
 
     public static void main(String[] args) {
             CommandRegistry<GlobalContext, CommandResult> registry = create(CommandResult.INVALID_COMMAND);
 
-            Command<GlobalContext, CommandResult> add = Command.literal(GlobalContext.class, CommandResult.class)
-                    .executes((a, b) -> {
-                        System.out.println("Time Added: " + b.getParameter("seconds", ArgumentTypes.INT));
-                        System.out.println(b.getParameter("unit", ArgumentTypes.INT));
-                        return CommandResult.PASS;
-                    })
-                    .withParameter("seconds", ArgumentTypes.INT)
-                    .withParameter("unit", ArgumentTypes.INT)
+
+            Command<GlobalContext, CommandResult> time = Util.literal()
+                    .subCommand("add",
+                            Util.literal()
+                                    .executes((a, b) -> {
+                                        System.out.println("Added " + b.getParameter("seconds", ArgumentTypes.INT));
+                                        System.out.println("Unit " + b.getParameter("unit", ArgumentTypes.INT));
+                                        System.out.println("Who Executed " + a.player());
+                                        return CommandResult.PASS;
+                                    })
+                                    .withParameter("seconds", ArgumentTypes.INT)
+                                    .withParameter("unit", ArgumentTypes.INT)
+                                    .build(CommandResult.PASS)
+                            )
                     .build(CommandResult.PASS);
 
-            registry.register(
-                    "time",
-                    Command.literal(GlobalContext.class, CommandResult.class)
-                            .subCommand("add", add)
-                            .build(CommandResult.PASS)
-            );
+
+            registry.register("time", time);
 
             System.out.println(
                     registry.execute(
                             new GlobalContext("mangorage"),
                             "time",
                             "add",
-                            "10900"
+                            "10900",
+                            "90"
                     )
             );
 
