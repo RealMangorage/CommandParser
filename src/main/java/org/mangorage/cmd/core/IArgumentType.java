@@ -1,5 +1,6 @@
 package org.mangorage.cmd.core;
 
-public interface IParser<O> {
+public interface IArgumentType<O> {
     O parse(String[] args);
+    Class<O> getType();
 }
