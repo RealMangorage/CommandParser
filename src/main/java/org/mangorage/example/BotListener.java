@@ -16,10 +16,12 @@ public final class BotListener {
         String message = event.getMessage().getContentRaw();
 
         if (message.startsWith("$")) {
-            dispatcher.execute(
+            int result = dispatcher.execute(
                     new DiscordContext(event),
                     message.substring(1)
             );
+            if (result == 0)
+                event.getMessage().reply("No Permission!").queue();
         }
     }
 }

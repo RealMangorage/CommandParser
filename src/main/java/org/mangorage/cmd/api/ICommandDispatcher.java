@@ -12,7 +12,7 @@ public interface ICommandDispatcher<S> {
 
     int execute(S context, String[] args);
 
-    default void execute(S context, String args) {
-        execute(context, args.split(" "));
+    default int execute(S context, String args) {
+        return execute(context, args.split(" "));
     }
 }

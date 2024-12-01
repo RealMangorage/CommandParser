@@ -97,6 +97,7 @@ public final class DiscordBot extends Thread {
                 .build();
 
         ICommand<DiscordContext> info = Command.literal(DiscordContext.class)
+                .requires(s -> false)
                 .executes(s -> {
                     var context = s.getContext();
                     context.reply(

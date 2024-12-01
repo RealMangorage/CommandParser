@@ -7,7 +7,7 @@ import org.mangorage.cmd.api.IntFunction;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public final class Command<S> implements ICommand<S> {
 
@@ -16,11 +16,13 @@ public final class Command<S> implements ICommand<S> {
     }
 
     private final IntFunction<ICommandSourceStack<S>> onExecute;
+    private final Predicate<ICommandSourceStack<S>> predicate;
     private final Map<String, ICommand<S>> subCommands;
     private final Map<String, IArgumentType<?>> parameters;
 
-    private Command(IntFunction<ICommandSourceStack<S>> onExecute, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
+    private Command(IntFunction<ICommandSourceStack<S>> onExecute, Predicate<ICommandSourceStack<S>> predicate, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
         this.onExecute = onExecute;
+        this.predicate = predicate;
         this.subCommands = subCommands;
         this.parameters = parameters;
     }
@@ -28,8 +30,7 @@ public final class Command<S> implements ICommand<S> {
     public int execute(ICommandSourceStack<S> commandSourceStack) {
         var args = commandSourceStack.getRemainingArgs();
         commandSourceStack.updateParameters(parameters);
-
-
+        if (!predicate.test(commandSourceStack)) return 0;
         if (args.length > 0) {
             var subCommand = subCommands.get(args[0]);
             if (subCommand != null) {
@@ -50,6 +51,7 @@ public final class Command<S> implements ICommand<S> {
 
     public static final class Builder<S> {
         private IntFunction<ICommandSourceStack<S>> onExecute;
+        private Predicate<ICommandSourceStack<S>> predicate;
         private final Map<String, ICommand<S>> subCommands = new HashMap<>();
         private final Map<String, IArgumentType<?>> parameters = new HashMap<>();
 
@@ -57,6 +59,11 @@ public final class Command<S> implements ICommand<S> {
 
         public Builder<S> executes(IntFunction<ICommandSourceStack<S>> onExecute) {
             this.onExecute = onExecute;
+            return this;
+        }
+
+        public Builder<S> requires(Predicate<ICommandSourceStack<S>> predicate) {
+            this.predicate = predicate;
             return this;
         }
 
@@ -72,7 +79,8 @@ public final class Command<S> implements ICommand<S> {
 
         public ICommand<S> build() {
             if (this.onExecute == null) executes(s -> 1);
-            return new Command<>(onExecute, subCommands, parameters);
+            if (this.predicate == null) requires(s -> true);
+            return new Command<>(onExecute, predicate, subCommands, parameters);
         }
     }
 }
