@@ -32,6 +32,8 @@ public final class DiscordBot extends Thread {
     private final JDA JDA;
     private final ICommandDispatcher<DiscordContext> dispatcher = CommandDispatcher.create(DiscordContext.class);
 
+    private int timer = 0;
+
     public DiscordBot() throws FileNotFoundException {
         this.JDA = JDABuilder.createDefault(
                 GSON.fromJson(
@@ -58,20 +60,62 @@ public final class DiscordBot extends Thread {
         ICommand<DiscordContext> add = Command.literal(DiscordContext.class)
                 .executes(s -> {
                     var context = s.getContext();
+                    var seconds = s.getParameter("seconds", ArgumentTypes.INT);
+                    timer += seconds;
                     context.reply(
-                            context.getUser().getGlobalName() + " Added " + s.getParameter("seconds", ArgumentTypes.INT) + " seconds to the timer!"
+                            context.getUser().getGlobalName() + " Added " + seconds + " seconds to the timer!"
                     );
                 })
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
 
+        ICommand<DiscordContext> remove = Command.literal(DiscordContext.class)
+                .executes(s -> {
+                    var context = s.getContext();
+                    var seconds = s.getParameter("seconds", ArgumentTypes.INT);
+                    timer -= seconds;
+                    context.reply(
+                            context.getUser().getGlobalName() + " Removed " + seconds + " seconds from the timer!"
+                    );
+                })
+                .withParameter("seconds", ArgumentTypes.INT)
+                .build();
+
+        ICommand<DiscordContext> set = Command.literal(DiscordContext.class)
+                .executes(s -> {
+                    var context = s.getContext();
+                    var seconds = s.getParameter("seconds", ArgumentTypes.INT);
+                    timer = seconds;
+                    context.reply(
+                            context.getUser().getGlobalName() + " Set timer to " + seconds + " seconds!"
+                    );
+                })
+                .withParameter("seconds", ArgumentTypes.INT)
+                .build();
+
+        ICommand<DiscordContext> info = Command.literal(DiscordContext.class)
+                .executes(s -> {
+                    var context = s.getContext();
+                    context.reply(
+                            "Timer has " + timer + " seconds!"
+                    );
+                })
+                .build();
+
         ICommand<DiscordContext> time = Command.literal(DiscordContext.class)
                 .executes(s -> {
                     s.getContext().reply(
-                            "Usage: time set <seconds:int>"
+                            """
+                            Usage:
+                                time add/remove/set <seconds:int>
+                                time info
+                            """
                     );
                 })
                 .subCommand("add", add)
+                .subCommand("remove", remove)
+                .subCommand("set", set)
+                .subCommand("info", info)
                 .build();
 
         dispatcher.register("time", time);
