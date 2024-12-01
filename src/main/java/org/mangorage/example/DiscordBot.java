@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.cmd.Util;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandDispatcher;
 import org.mangorage.cmd.impl.Command;
