@@ -1,4 +1,6 @@
-package org.mangorage.cmd.core.argument;
+package org.mangorage.cmd.impl.argument;
+
+import org.mangorage.cmd.api.IArgumentType;
 
 import java.util.function.Function;
 

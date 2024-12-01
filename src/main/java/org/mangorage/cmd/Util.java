@@ -1,8 +1,7 @@
 package org.mangorage.cmd;
 
-import org.mangorage.cmd.core.Command;
-import org.mangorage.cmd.core.CommandRegistry;
-import org.mangorage.cmd.core.context.CommandResult;
+import org.mangorage.cmd.impl.Command;
+import org.mangorage.cmd.impl.CommandDispatcher;
 
 import java.util.Arrays;
 
@@ -15,7 +14,11 @@ public class Util {
         }
     }
 
-    public static Command.Builder<CommandRegistry.GlobalContext, CommandResult> literal() {
-        return Command.literal(CommandRegistry.GlobalContext.class, CommandResult.class);
+    public static String removeFirst(String string) {
+        return string.substring(1);
+    }
+
+    public static Command.Builder<CommandDispatcher.GlobalContext> literal() {
+        return Command.literal(CommandDispatcher.GlobalContext.class);
     }
 }

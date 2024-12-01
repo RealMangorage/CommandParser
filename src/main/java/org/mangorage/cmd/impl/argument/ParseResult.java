@@ -1,4 +1,4 @@
-package org.mangorage.cmd.core.argument;
+package org.mangorage.cmd.impl.argument;
 
 public final class ParseResult<O> {
     private final O result;

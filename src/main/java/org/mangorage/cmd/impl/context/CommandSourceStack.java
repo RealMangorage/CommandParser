@@ -1,23 +1,27 @@
-package org.mangorage.cmd.core.context;
+package org.mangorage.cmd.impl.context;
 
-import org.mangorage.cmd.core.argument.IArgumentType;
-import org.mangorage.cmd.core.argument.ParseResult;
+import org.mangorage.cmd.Util;
+import org.mangorage.cmd.api.IArgumentType;
+import org.mangorage.cmd.api.ICommandSourceStack;
+import org.mangorage.cmd.impl.argument.ParseResult;
 
 import java.util.Map;
 import java.util.Optional;
 
-public final class CommandSourceStack {
+public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
-    public static CommandSourceStack of(Map<String, IArgumentType<?>> parameters, String[] args) {
-        return new CommandSourceStack(parameters, args);
+    public static <S> CommandSourceStack<S> of(S context, String[] args) {
+        return new CommandSourceStack<>(context, args);
     }
 
-    private final Map<String, IArgumentType<?>> parameters;
+    private final S context;
     private final String[] args;
+
+    private Map<String, IArgumentType<?>> parameters;
     private String[] remaining;
 
-    private CommandSourceStack(Map<String, IArgumentType<?>> parameters, String[] args) {
-        this.parameters = parameters;
+    private CommandSourceStack(S context, String[] args) {
+        this.context = context;
         this.args = args;
         this.remaining = args;
     }
@@ -34,6 +38,11 @@ public final class CommandSourceStack {
         return result.getResult();
     }
 
+    @Override
+    public S getContext() {
+        return context;
+    }
+
     public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser) {
         try {
             return Optional.of(getParameter(id, parser));
@@ -46,7 +55,18 @@ public final class CommandSourceStack {
         return args;
     }
 
-    public String[] getRemaining() {
+    @Override
+    public String[] getRemainingArgs() {
         return remaining;
+    }
+
+    @Override
+    public void shrinkArgs() {
+        this.remaining = Util.shrinkArray(getRemainingArgs());
+    }
+
+    @Override
+    public void updateParameters(Map<String, IArgumentType<?>> parameters) {
+        this.parameters = Map.copyOf(parameters);
     }
 }

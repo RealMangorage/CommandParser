@@ -1,3 +1,3 @@
-package org.mangorage.cmd.core;
+package org.mangorage.cmd.impl.exceptions;
 
 public final class ContextParseException extends Exception {}
