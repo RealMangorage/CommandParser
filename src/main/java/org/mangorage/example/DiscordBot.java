@@ -65,6 +65,7 @@ public final class DiscordBot extends Thread {
                     context.reply(
                             context.getUser().getGlobalName() + " Added " + seconds + " seconds to the timer!"
                     );
+                    return 1;
                 })
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
@@ -77,6 +78,7 @@ public final class DiscordBot extends Thread {
                     context.reply(
                             context.getUser().getGlobalName() + " Removed " + seconds + " seconds from the timer!"
                     );
+                    return 1;
                 })
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
@@ -89,6 +91,7 @@ public final class DiscordBot extends Thread {
                     context.reply(
                             context.getUser().getGlobalName() + " Set timer to " + seconds + " seconds!"
                     );
+                    return 1;
                 })
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
@@ -99,6 +102,7 @@ public final class DiscordBot extends Thread {
                     context.reply(
                             "Timer has " + timer + " seconds!"
                     );
+                    return 1;
                 })
                 .build();
 
@@ -111,6 +115,7 @@ public final class DiscordBot extends Thread {
                                 time info
                             """
                     );
+                    return 1;
                 })
                 .subCommand("add", add)
                 .subCommand("remove", remove)

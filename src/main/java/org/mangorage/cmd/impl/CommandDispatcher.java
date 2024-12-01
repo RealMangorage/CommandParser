@@ -23,16 +23,17 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
     }
 
     @Override
-    public void execute(S context, String... args) {
+    public int execute(S context, String... args) {
         if (args.length >= 1) {
             var cmd = commandMap.get(args[0]);
             if (cmd != null)
-                cmd.execute(
+                return cmd.execute(
                         CommandSourceStack.of(
                                 context,
                                 Util.shrinkArray(args)
                         )
                 );
         }
+        return -1;
     }
 }

@@ -3,6 +3,8 @@ package org.mangorage.cmd.impl;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.api.IArgumentType;
+import org.mangorage.cmd.api.IntFunction;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -13,29 +15,31 @@ public final class Command<S> implements ICommand<S> {
         return new Builder<>();
     }
 
-    private final Consumer<ICommandSourceStack<S>> onExecute;
+    private final IntFunction<ICommandSourceStack<S>> onExecute;
     private final Map<String, ICommand<S>> subCommands;
     private final Map<String, IArgumentType<?>> parameters;
 
-    private Command(final Consumer<ICommandSourceStack<S>> onExecute, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
+    private Command(IntFunction<ICommandSourceStack<S>> onExecute, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
         this.onExecute = onExecute;
         this.subCommands = subCommands;
         this.parameters = parameters;
     }
 
-    public void execute(ICommandSourceStack<S> commandSourceStack) {
+    public int execute(ICommandSourceStack<S> commandSourceStack) {
         var args = commandSourceStack.getRemainingArgs();
         commandSourceStack.updateParameters(parameters);
+
+
         if (args.length > 0) {
             var subCommand = subCommands.get(args[0]);
             if (subCommand != null) {
                 commandSourceStack.shrinkArgs();
-                subCommand.execute(commandSourceStack);
+                return subCommand.execute(commandSourceStack);
+            } else {
+                return onExecute.apply(commandSourceStack);
             }
-            else
-                onExecute.accept(commandSourceStack);
         } else {
-            onExecute.accept(commandSourceStack);
+            return onExecute.apply(commandSourceStack);
         }
     }
 
@@ -45,13 +49,13 @@ public final class Command<S> implements ICommand<S> {
     }
 
     public static final class Builder<S> {
-        private Consumer<ICommandSourceStack<S>> onExecute;
+        private IntFunction<ICommandSourceStack<S>> onExecute;
         private final Map<String, ICommand<S>> subCommands = new HashMap<>();
         private final Map<String, IArgumentType<?>> parameters = new HashMap<>();
 
         private Builder() {}
 
-        public Builder<S> executes(Consumer<ICommandSourceStack<S>> onExecute) {
+        public Builder<S> executes(IntFunction<ICommandSourceStack<S>> onExecute) {
             this.onExecute = onExecute;
             return this;
         }
@@ -67,7 +71,7 @@ public final class Command<S> implements ICommand<S> {
         }
 
         public ICommand<S> build() {
-            if (this.onExecute == null) executes(s -> {});
+            if (this.onExecute == null) executes(s -> 1);
             return new Command<>(onExecute, subCommands, parameters);
         }
     }
