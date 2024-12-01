@@ -3,8 +3,10 @@ package org.mangorage.cmd.impl.context;
 import org.mangorage.cmd.Util;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.ICommandSourceStack;
+import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.cmd.impl.argument.ParseResult;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     private final String[] args;
 
     private Map<String, IArgumentType<?>> parameters;
+    private final Map<String, ParseError> parseErrors = new HashMap<>();
     private String[] remaining;
 
     private CommandSourceStack(S context, String[] args) {
@@ -68,5 +71,6 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     @Override
     public void updateParameters(Map<String, IArgumentType<?>> parameters) {
         this.parameters = Map.copyOf(parameters);
+        this.parseErrors.clear();
     }
 }
