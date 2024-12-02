@@ -4,25 +4,31 @@ import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.IntFunction;
+import org.mangorage.cmd.impl.context.CommandSourceStack;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Command<S> implements ICommand<S> {
 
-    public static <S> Command.Builder<S> literal(Class<S> contextClass) {
-        return new Builder<>();
+    public static <S> Command.Builder<S> literal(String id, Class<S> contextClass) {
+        return new Builder<>(id);
     }
 
+    private final String id;
     private final IntFunction<ICommandSourceStack<S>> onExecute;
+    private final Consumer<ICommandSourceStack<S>> onError;
     private final Predicate<ICommandSourceStack<S>> predicate;
     private final Map<String, ICommand<S>> subCommands;
     private final Map<String, IArgumentType<?>> parameters;
 
-    private Command(IntFunction<ICommandSourceStack<S>> onExecute, Predicate<ICommandSourceStack<S>> predicate, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
+    private Command(String id, IntFunction<ICommandSourceStack<S>> onExecute, Consumer<ICommandSourceStack<S>> onError, Predicate<ICommandSourceStack<S>> predicate, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
+        this.id = id;
         this.onExecute = onExecute;
+        this.onError = onError;
         this.predicate = predicate;
         this.subCommands = subCommands;
         this.parameters = parameters;
@@ -49,6 +55,7 @@ public final class Command<S> implements ICommand<S> {
         try {
             return onExecute.apply(commandSourceStack);
         } catch (Throwable exception) {
+            onError.accept(commandSourceStack);
             return 2;
         }
     }
@@ -58,16 +65,30 @@ public final class Command<S> implements ICommand<S> {
         return Map.copyOf(parameters);
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
     public static final class Builder<S> {
+        private final String id;
         private IntFunction<ICommandSourceStack<S>> onExecute;
+        private Consumer<ICommandSourceStack<S>> onError;
         private Predicate<ICommandSourceStack<S>> predicate;
         private final Map<String, ICommand<S>> subCommands = new HashMap<>();
         private final Map<String, IArgumentType<?>> parameters = new HashMap<>();
 
-        private Builder() {}
+        private Builder(String id) {
+            this.id = id;
+        }
 
         public Builder<S> executes(IntFunction<ICommandSourceStack<S>> onExecute) {
             this.onExecute = onExecute;
+            return this;
+        }
+
+        public Builder<S> onError(Consumer<ICommandSourceStack<S>> onError) {
+            this.onError = onError;
             return this;
         }
 
@@ -76,8 +97,15 @@ public final class Command<S> implements ICommand<S> {
             return this;
         }
 
-        public Builder<S> subCommand(String id, ICommand<S> command) {
-            this.subCommands.put(id, command);
+        public Builder<S> subCommand(ICommand<S> command) {
+            this.subCommands.put(command.getId(), command);
+            return this;
+        }
+
+        public Builder<S> subCommands(List<ICommand<S>> commands) {
+            for (ICommand<S> command : commands) {
+                this.subCommands.put(command.getId(), command);
+            }
             return this;
         }
 
@@ -88,8 +116,16 @@ public final class Command<S> implements ICommand<S> {
 
         public ICommand<S> build() {
             if (this.onExecute == null) executes(s -> 1);
+            if (this.onError == null) onError(s -> {});
             if (this.predicate == null) requires(s -> true);
-            return new Command<>(onExecute, predicate, subCommands, parameters);
+            return new Command<>(
+                    id,
+                    onExecute,
+                    onError,
+                    predicate,
+                    subCommands,
+                    parameters
+            );
         }
     }
 }

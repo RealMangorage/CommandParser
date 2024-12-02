@@ -7,7 +7,7 @@ public final class ParseResult<O> {
     private final String[] remaining;
     private ParseError error;
 
-    public ParseResult(ParseError error, String[] args) {
+    public ParseResult(ParseError error) {
         this.error = error;
         this.result = null;
         this.remaining = null;

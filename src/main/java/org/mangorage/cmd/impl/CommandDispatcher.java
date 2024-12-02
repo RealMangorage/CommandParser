@@ -18,8 +18,8 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
     private CommandDispatcher() {}
 
     @Override
-    public void register(String id, ICommand<S> command) {
-        commandMap.put(id, command);
+    public void register(ICommand<S> command) {
+        commandMap.put(command.getId(), command);
     }
 
     @Override

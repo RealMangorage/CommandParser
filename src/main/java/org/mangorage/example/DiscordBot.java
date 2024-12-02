@@ -13,6 +13,7 @@ import org.mangorage.cmd.api.ICommandDispatcher;
 import org.mangorage.cmd.impl.Command;
 import org.mangorage.cmd.impl.CommandDispatcher;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
+import org.mangorage.cmd.impl.argument.ParseError;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -27,7 +28,6 @@ public final class DiscordBot extends Thread {
     public static void main(String[] args) throws FileNotFoundException {
         new DiscordBot().start();
     }
-
 
     private final JDA JDA;
     private final ICommandDispatcher<DiscordContext> dispatcher = CommandDispatcher.create(DiscordContext.class);
@@ -57,7 +57,14 @@ public final class DiscordBot extends Thread {
                 .setEventManager(new AnnotatedEventManager())
                 .build();
 
-        ICommand<DiscordContext> add = Command.literal(DiscordContext.class)
+        ICommand<DiscordContext> add = Command.literal("add", DiscordContext.class)
+                .onError(s -> {
+                    if (s.getParsingErrors().containsKey("seconds")) {
+                        var error = s.getParsingErrors().get("seconds");
+                        if (error == ParseError.INCOMPLETE)
+                            s.getContext().reply("Missing parameter seconds: time add/remove/set <seconds>");
+                    }
+                })
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -70,7 +77,7 @@ public final class DiscordBot extends Thread {
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
 
-        ICommand<DiscordContext> remove = Command.literal(DiscordContext.class)
+        ICommand<DiscordContext> remove = Command.literal("remove", DiscordContext.class)
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -83,7 +90,7 @@ public final class DiscordBot extends Thread {
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
 
-        ICommand<DiscordContext> set = Command.literal(DiscordContext.class)
+        ICommand<DiscordContext> set = Command.literal("set", DiscordContext.class)
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -96,7 +103,7 @@ public final class DiscordBot extends Thread {
                 .withParameter("seconds", ArgumentTypes.INT)
                 .build();
 
-        ICommand<DiscordContext> info = Command.literal(DiscordContext.class)
+        ICommand<DiscordContext> info = Command.literal("info", DiscordContext.class)
                 .requires(s -> false)
                 .executes(s -> {
                     var context = s.getContext();
@@ -107,7 +114,7 @@ public final class DiscordBot extends Thread {
                 })
                 .build();
 
-        ICommand<DiscordContext> time = Command.literal(DiscordContext.class)
+        ICommand<DiscordContext> time = Command.literal("time", DiscordContext.class)
                 .executes(s -> {
                     s.getContext().reply(
                             """
@@ -118,13 +125,17 @@ public final class DiscordBot extends Thread {
                     );
                     return 1;
                 })
-                .subCommand("add", add)
-                .subCommand("remove", remove)
-                .subCommand("set", set)
-                .subCommand("info", info)
+                .subCommands(
+                    List.of(
+                            add,
+                            remove,
+                            set,
+                            info
+                    )
+                )
                 .build();
 
-        dispatcher.register("time", time);
+        dispatcher.register(time);
 
         JDA.addEventListener(new BotListener(dispatcher));
     }

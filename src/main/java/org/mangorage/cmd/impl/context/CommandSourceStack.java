@@ -15,11 +15,11 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         return new CommandSourceStack<>(context, args);
     }
 
+    private final Map<String, ParseError> parseErrors = new HashMap<>();
     private final S context;
     private final String[] args;
 
     private Map<String, IArgumentType<?>> parameters;
-    private final Map<String, ParseError> parseErrors = new HashMap<>();
     private String[] remaining;
 
     private CommandSourceStack(S context, String[] args) {

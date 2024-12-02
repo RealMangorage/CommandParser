@@ -1,7 +1,7 @@
 package org.mangorage.cmd.api;
 
 public interface ICommandDispatcher<S> {
-    void register(String id, ICommand<S> command);
+    void register(ICommand<S> command);
 
     /**
      * Defgult Int Return Types:
