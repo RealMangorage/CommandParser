@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandDispatcher;
 import org.mangorage.cmd.impl.Command;
+import org.mangorage.cmd.impl.CommandAlias;
 import org.mangorage.cmd.impl.CommandDispatcher;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
@@ -18,16 +19,15 @@ import org.mangorage.cmd.impl.argument.ParseError;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
-public final class DiscordBot extends Thread {
+public final class DiscordBot {
     public static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
     public static void main(String[] args) throws FileNotFoundException {
-        new DiscordBot().start();
+        new DiscordBot();
     }
 
     private final JDA JDA;
@@ -150,6 +150,8 @@ public final class DiscordBot extends Thread {
                 })
                 .build();
 
+        ICommand<DiscordContext> test = CommandAlias.of("test", set);
+
         ICommand<DiscordContext> time = Command.literal("time", DiscordContext.class)
                 .executes(s -> {
                     s.getContext().reply(
@@ -166,7 +168,8 @@ public final class DiscordBot extends Thread {
                             add,
                             remove,
                             set,
-                            info
+                            info,
+                            test
                     )
                 )
                 .build();
@@ -174,17 +177,5 @@ public final class DiscordBot extends Thread {
         dispatcher.register(time);
 
         JDA.addEventListener(new BotListener(dispatcher));
-    }
-
-    @Override
-    public void run() {
-        try {
-            JDA.awaitStatus(
-                    net.dv8tion.jda.api.JDA.Status.CONNECTED
-            );
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Bot Connected");
     }
 }
