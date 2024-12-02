@@ -5,6 +5,7 @@ import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.IntFunction;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -37,10 +38,18 @@ public final class Command<S> implements ICommand<S> {
                 commandSourceStack.shrinkArgs();
                 return subCommand.execute(commandSourceStack);
             } else {
-                return onExecute.apply(commandSourceStack);
+                return finalizeExecute(commandSourceStack);
             }
         } else {
+            return finalizeExecute(commandSourceStack);
+        }
+    }
+
+    private int finalizeExecute(ICommandSourceStack<S> commandSourceStack) {
+        try {
             return onExecute.apply(commandSourceStack);
+        } catch (Throwable exception) {
+            return 2;
         }
     }
 

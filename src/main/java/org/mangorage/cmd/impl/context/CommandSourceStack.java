@@ -8,7 +8,6 @@ import org.mangorage.cmd.impl.argument.ParseResult;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
@@ -37,21 +36,21 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
             throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getType(), actualType.getType()));
 
         ParseResult<O> result = parser.parse(remaining);
+        if (result.getError() != null) {
+            parseErrors.put(id, result.getError());
+        }
         this.remaining = result.getRemaining();
         return result.getResult();
     }
 
     @Override
-    public S getContext() {
-        return context;
+    public Map<String, ParseError> getParsingErrors() {
+        return Map.copyOf(parseErrors);
     }
 
-    public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser) {
-        try {
-            return Optional.of(getParameter(id, parser));
-        } catch (Throwable e) {
-            return Optional.empty();
-        }
+    @Override
+    public S getContext() {
+        return context;
     }
 
     public String[] getArgs() {

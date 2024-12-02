@@ -1,5 +1,7 @@
 package org.mangorage.cmd.api;
 
+import org.mangorage.cmd.impl.argument.ParseError;
+
 import java.util.Map;
 
 public interface ICommandSourceStack<S> {
@@ -11,5 +13,6 @@ public interface ICommandSourceStack<S> {
     void updateParameters(Map<String, IArgumentType<?>> parameters);
     <O> O getParameter(String id, IArgumentType<O> parser);
 
+    Map<String, ParseError> getParsingErrors();
     S getContext();
 }

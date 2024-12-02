@@ -22,6 +22,8 @@ public final class BotListener {
             );
             if (result == 0)
                 event.getMessage().reply("No Permission!").queue();
+            if (result == 2)
+                event.getMessage().reply("Error Occured").queue();
         }
     }
 }

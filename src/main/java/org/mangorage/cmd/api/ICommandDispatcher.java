@@ -8,6 +8,7 @@ public interface ICommandDispatcher<S> {
      * -1 INVALID
      * 0 NO PERMS
      * 1 PASS
+     * 2 ERROR
      */
 
     int execute(S context, String[] args);
