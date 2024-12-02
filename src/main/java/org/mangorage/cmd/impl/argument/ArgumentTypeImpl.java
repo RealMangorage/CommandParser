@@ -15,7 +15,11 @@ public final class ArgumentTypeImpl<O> implements IArgumentType<O> {
 
     @Override
     public ParseResult<O> parse(String[] args) {
-        return function.apply(args);
+        try {
+            return function.apply(args);
+        } catch (Throwable throwable) {
+            return new ParseResult<>(ParseError.MALFORMED);
+        }
     }
 
     @Override

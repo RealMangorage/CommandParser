@@ -18,6 +18,7 @@ import org.mangorage.cmd.impl.argument.ParseError;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 public final class DiscordBot extends Thread {
@@ -59,11 +60,18 @@ public final class DiscordBot extends Thread {
 
         ICommand<DiscordContext> add = Command.literal("add", DiscordContext.class)
                 .onError(s -> {
-                    if (s.getParsingErrors().containsKey("seconds")) {
-                        var error = s.getParsingErrors().get("seconds");
-                        if (error == ParseError.INCOMPLETE)
-                            s.getContext().reply("Missing parameter seconds: time add/remove/set <seconds>");
-                    }
+                    s.ifErrorPresent("seconds", e -> e == ParseError.INCOMPLETE, e -> {
+                        s.getContext().reply("""
+                                Missing Parameter: seconds
+                                  -> time add/remove/set <seconds>
+                                """);
+                    });
+                    s.ifErrorPresent("seconds", e -> e == ParseError.MALFORMED, e -> {
+                        s.getContext().reply("""
+                                Malformed Parameter: seconds
+                                  -> Expected Integer, got %s
+                                """.formatted(s.getPreviousRemainingArgs()[0]));
+                    });
                 })
                 .executes(s -> {
                     var context = s.getContext();
@@ -78,6 +86,20 @@ public final class DiscordBot extends Thread {
                 .build();
 
         ICommand<DiscordContext> remove = Command.literal("remove", DiscordContext.class)
+                .onError(s -> {
+                    s.ifErrorPresent("seconds", e -> e == ParseError.INCOMPLETE, e -> {
+                        s.getContext().reply("""
+                                Missing Parameter: seconds
+                                  -> time add/remove/set <seconds>
+                                """);
+                    });
+                    s.ifErrorPresent("seconds", e -> e == ParseError.MALFORMED, e -> {
+                        s.getContext().reply("""
+                                Malformed Parameter: seconds
+                                  -> Expected Integer, got %s
+                                """.formatted(s.getPreviousRemainingArgs()[0]));
+                    });
+                })
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -91,6 +113,20 @@ public final class DiscordBot extends Thread {
                 .build();
 
         ICommand<DiscordContext> set = Command.literal("set", DiscordContext.class)
+                .onError(s -> {
+                    s.ifErrorPresent("seconds", e -> e == ParseError.INCOMPLETE, e -> {
+                        s.getContext().reply("""
+                                Missing Parameter: seconds
+                                  -> time add/remove/set <seconds>
+                                """);
+                    });
+                    s.ifErrorPresent("seconds", e -> e == ParseError.MALFORMED, e -> {
+                        s.getContext().reply("""
+                                Malformed Parameter: seconds
+                                  -> Expected Integer, got %s
+                                """.formatted(s.getPreviousRemainingArgs()[0]));
+                    });
+                })
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);

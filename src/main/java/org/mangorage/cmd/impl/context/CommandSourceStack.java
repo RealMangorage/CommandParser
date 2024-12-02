@@ -8,6 +8,8 @@ import org.mangorage.cmd.impl.argument.ParseResult;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
@@ -21,6 +23,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
     private Map<String, IArgumentType<?>> parameters;
     private String[] remaining;
+    private String[] previousRemaining;
 
     private CommandSourceStack(S context, String[] args) {
         this.context = context;
@@ -39,6 +42,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         if (result.getError() != null) {
             parseErrors.put(id, result.getError());
         }
+        this.previousRemaining = this.remaining;
         this.remaining = result.getRemaining();
         return result.getResult();
     }
@@ -46,6 +50,15 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     @Override
     public Map<String, ParseError> getParsingErrors() {
         return Map.copyOf(parseErrors);
+    }
+
+    @Override
+    public void ifErrorPresent(String id, Predicate<ParseError> predicate, Consumer<ParseError> consumer) {
+        var error = parseErrors.get(id);
+        if (error != null) {
+            if (predicate.test(error))
+                consumer.accept(error);
+        }
     }
 
     @Override
@@ -60,6 +73,11 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     @Override
     public String[] getRemainingArgs() {
         return remaining;
+    }
+
+    @Override
+    public String[] getPreviousRemainingArgs() {
+        return previousRemaining;
     }
 
     @Override
