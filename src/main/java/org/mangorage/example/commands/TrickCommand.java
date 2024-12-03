@@ -1,7 +1,6 @@
 package org.mangorage.example.commands;
 
 import org.mangorage.cmd.api.ICommand;
-import org.mangorage.cmd.impl.CommandArgument;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.example.DiscordContext;
