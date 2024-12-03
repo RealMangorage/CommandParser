@@ -8,6 +8,7 @@ import org.mangorage.cmd.impl.argument.ParseResult;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -31,6 +32,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         this.remaining = args;
     }
 
+    @Override
     public <O> O getParameter(String id, IArgumentType<O> parser) {
         var actualType = parameters.get(id);
         if (actualType == null)
@@ -45,6 +47,27 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         this.previousRemaining = this.remaining;
         this.remaining = result.getRemaining();
         return result.getResult();
+    }
+
+    @Override
+    public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser) {
+        var actualType = parameters.get(id);
+        if (actualType == null)
+            throw new IllegalStateException("Invalid Parameter Type %s".formatted(id));
+        if (actualType != parser)
+            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getType(), actualType.getType()));
+
+        try {
+            ParseResult<O> result = parser.parse(remaining);
+            if (result.getError() != null) {
+                parseErrors.put(id, result.getError());
+            }
+            this.previousRemaining = this.remaining;
+            this.remaining = result.getRemaining();
+            return Optional.of(result.getResult());
+        } catch (Throwable throwable) {
+            return Optional.empty();
+        }
     }
 
     @Override

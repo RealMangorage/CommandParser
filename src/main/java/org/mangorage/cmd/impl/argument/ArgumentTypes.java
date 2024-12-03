@@ -11,6 +11,11 @@ public final class ArgumentTypes {
             Util.shrinkArray(p)
     ));
 
+    public static final IArgumentType<Boolean> BOOL = new ArgumentTypeImpl<>(Boolean.class, p -> new ParseResult<>(
+            Boolean.parseBoolean(p[0]),
+            Util.shrinkArray(p)
+    ));
+
     public static final IArgumentType<String> STRING = new ArgumentTypeImpl<>(String.class, p -> new ParseResult<>(
             p[0],
             Util.shrinkArray(p)

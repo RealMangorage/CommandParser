@@ -17,6 +17,7 @@ public interface ICommandSourceStack<S> {
 
     void updateParameters(Map<String, IArgumentType<?>> parameters);
     <O> O getParameter(String id, IArgumentType<O> parser);
+    <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser);
 
     Map<String, ParseError> getParsingErrors();
     void ifErrorPresent(String id, Predicate<ParseError> predicate, Consumer<ParseError> consumer);

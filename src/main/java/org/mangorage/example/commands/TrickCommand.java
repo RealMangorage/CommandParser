@@ -3,6 +3,7 @@ package org.mangorage.example.commands;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.impl.Command;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
+import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.example.DiscordContext;
 import org.mangorage.example.api.ICommandRegistrar;
 
@@ -17,22 +18,37 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
     @Override
     public ICommand<DiscordContext> create() {
         ICommand<DiscordContext> create = Command.literal("create", DiscordContext.class)
+                .onError(s -> {
+                    s.ifErrorPresent("content", e -> e == ParseError.INCOMPLETE, s2 -> {
+                        s.getContext().reply("Content Parameter Incomplete");
+                    });
+                })
                 .executes(s -> {
                     var context = s.getContext();
 
                     var id = s.getParameter("id", ArgumentTypes.STRING);
+                    var tag = s.getOptionalParameter("tag", ArgumentTypes.BOOL);
                     var content = s.getParameter("content", ArgumentTypes.STRING_ALL);
+
+                    tag.ifPresent(t -> {
+                        s.getContext().reply("TAGGED");
+                    });
 
                     if (tricks.containsKey(id)) {
                         context.reply("Already have trick with id %s".formatted(id));
                         return 1;
                     } else {
+                        if (content.isEmpty() || content.isBlank()) {
+                            context.reply("Content empty");
+                            return 1;
+                        }
                         tricks.put(id, content);
                         context.reply("Created new Trick with id %s".formatted(id));
                         return 1;
                     }
                 })
                 .withParameter("id", ArgumentTypes.STRING)
+                .withParameter("tag", ArgumentTypes.BOOL)
                 .withParameter("content", ArgumentTypes.STRING_ALL)
                 .build();
 
@@ -50,6 +66,10 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                 .build();
 
         return Command.literal("trick", DiscordContext.class)
+                .executes(s -> {
+                    s.getContext().reply("trick create/show <id> <create:content>");
+                    return 1;
+                })
                 .subCommands(
                         List.of(create, show)
                 )
