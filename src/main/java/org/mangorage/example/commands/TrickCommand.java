@@ -44,19 +44,19 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                         return 1;
                     }
                 })
-                .withArgument(
-                        CommandArgument.literal("id", ArgumentTypes.STRING, DiscordContext.class)
-                                .onError((s, e) -> {
-                                    s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
-                                })
-                                .build()
-                )
-                .withArgument(
-                        CommandArgument.literal("content", ArgumentTypes.STRING_ALL, DiscordContext.class)
-                                .onError((s, e) -> {
-                                    s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
-                                })
-                                .build()
+                .withArguments(
+                        List.of(
+                                CommandArgument.literal("id", ArgumentTypes.STRING, DiscordContext.class)
+                                        .onError((s, e) -> {
+                                            s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                        })
+                                        .build(),
+                                CommandArgument.literal("content", ArgumentTypes.STRING_ALL, DiscordContext.class)
+                                        .onError((s, e) -> {
+                                            s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                        })
+                                        .build()
+                        )
                 )
                 .build();
 
@@ -85,7 +85,10 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                     return 1;
                 })
                 .subCommands(
-                        List.of(create, show)
+                        List.of(
+                            create,
+                            show
+                        )
                 )
                 .build();
     }

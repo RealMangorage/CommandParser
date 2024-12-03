@@ -100,12 +100,13 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 })
                 .subCommands(
                         List.of(
-                                add,
-                                remove,
-                                set,
-                                info,
-                                test
+                            add,
+                            remove,
+                            set,
+                            info,
+                            test
                         )
+
                 )
                 .build();
     }

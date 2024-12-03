@@ -5,6 +5,7 @@ import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.api.IntFunction;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,9 +103,9 @@ public final class Command<S> implements ICommand<S> {
             return this;
         }
 
-        public Builder<S> subCommands(List<ICommand<S>> commands) {
+        public Builder<S> subCommands(Collection<ICommand<S>> commands) {
             for (ICommand<S> command : commands) {
-                this.subCommands.put(command.getId(), command);
+                subCommand(command);
             }
             return this;
         }
@@ -113,6 +114,14 @@ public final class Command<S> implements ICommand<S> {
             this.parameters.put(argument.getId(), argument);
             return this;
         }
+
+        public Builder<S> withArguments(Collection<IArgument<S>> arguments) {
+            for (IArgument<S> argument : arguments) {
+                withArgument(argument);
+            }
+            return this;
+        }
+
 
         public ICommand<S> build() {
             if (this.onExecute == null) executes(s -> 1);
