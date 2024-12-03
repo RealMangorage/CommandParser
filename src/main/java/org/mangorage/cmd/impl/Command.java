@@ -7,15 +7,14 @@ import org.mangorage.cmd.api.IntFunction;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Command<S> implements ICommand<S> {
 
-    public static <S> Command.Builder<S> literal(String id, Class<S> contextClass) {
-        return new Builder<>(id);
+    public static <S> CommandBuilder<S> literal(String id, Class<S> contextClass) {
+        return new CommandBuilder<>(id);
     }
 
     private final String id;
@@ -71,7 +70,7 @@ public final class Command<S> implements ICommand<S> {
         return id;
     }
 
-    public static final class Builder<S> {
+    public static final class CommandBuilder<S> {
         private final String id;
         private IntFunction<ICommandSourceStack<S>> onExecute;
         private Consumer<ICommandSourceStack<S>> onError;
@@ -79,43 +78,43 @@ public final class Command<S> implements ICommand<S> {
         private final Map<String, ICommand<S>> subCommands = new HashMap<>();
         private final Map<String, IArgument<S>> parameters = new HashMap<>();
 
-        private Builder(String id) {
+        private CommandBuilder(String id) {
             this.id = id;
         }
 
-        public Builder<S> executes(IntFunction<ICommandSourceStack<S>> onExecute) {
+        public CommandBuilder<S> executes(IntFunction<ICommandSourceStack<S>> onExecute) {
             this.onExecute = onExecute;
             return this;
         }
 
-        public Builder<S> onError(Consumer<ICommandSourceStack<S>> onError) {
+        public CommandBuilder<S> onError(Consumer<ICommandSourceStack<S>> onError) {
             this.onError = onError;
             return this;
         }
 
-        public Builder<S> requires(Predicate<ICommandSourceStack<S>> predicate) {
+        public CommandBuilder<S> requires(Predicate<ICommandSourceStack<S>> predicate) {
             this.predicate = predicate;
             return this;
         }
 
-        public Builder<S> subCommand(ICommand<S> command) {
+        public CommandBuilder<S> subCommand(ICommand<S> command) {
             this.subCommands.put(command.getId(), command);
             return this;
         }
 
-        public Builder<S> subCommands(Collection<ICommand<S>> commands) {
+        public CommandBuilder<S> subCommands(Collection<ICommand<S>> commands) {
             for (ICommand<S> command : commands) {
                 subCommand(command);
             }
             return this;
         }
 
-        public Builder<S> withArgument(IArgument<S> argument) {
+        public CommandBuilder<S> withArgument(IArgument<S> argument) {
             this.parameters.put(argument.getId(), argument);
             return this;
         }
 
-        public Builder<S> withArguments(Collection<IArgument<S>> arguments) {
+        public CommandBuilder<S> withArguments(Collection<IArgument<S>> arguments) {
             for (IArgument<S> argument : arguments) {
                 withArgument(argument);
             }

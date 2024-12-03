@@ -17,7 +17,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
 
     @Override
     public ICommand<DiscordContext> create() {
-        ICommand<DiscordContext> add = Command.literal("add", DiscordContext.class)
+        ICommand<DiscordContext> add = DiscordContext.literal("add")
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -28,7 +28,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                     return 1;
                 })
                 .withArgument(
-                        CommandArgument.literal("seconds", ArgumentTypes.INT, DiscordContext.class)
+                        DiscordContext.argument("seconds", ArgumentTypes.INT)
                                 .onError((s, e) -> {
                                     s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
                                 })
@@ -36,7 +36,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 )
                 .build();
 
-        ICommand<DiscordContext> remove = Command.literal("remove", DiscordContext.class)
+        ICommand<DiscordContext> remove = DiscordContext.literal("remove")
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -47,7 +47,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                     return 1;
                 })
                 .withArgument(
-                        CommandArgument.literal("seconds", ArgumentTypes.INT, DiscordContext.class)
+                        DiscordContext.argument("seconds", ArgumentTypes.INT)
                                 .onError((s, e) -> {
                                     s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
                                 })
@@ -55,7 +55,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 )
                 .build();
 
-        ICommand<DiscordContext> set = Command.literal("set", DiscordContext.class)
+        ICommand<DiscordContext> set = DiscordContext.literal("set")
                 .executes(s -> {
                     var context = s.getContext();
                     var seconds = s.getParameter("seconds", ArgumentTypes.INT);
@@ -66,7 +66,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                     return 1;
                 })
                 .withArgument(
-                        CommandArgument.literal("seconds", ArgumentTypes.INT, DiscordContext.class)
+                        DiscordContext.argument("seconds", ArgumentTypes.INT)
                                 .onError((s, e) -> {
                                     s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
                                 })
@@ -74,8 +74,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 )
                 .build();
 
-        ICommand<DiscordContext> info = Command.literal("info", DiscordContext.class)
-                .requires(s -> false)
+        ICommand<DiscordContext> info = DiscordContext.literal("info")
                 .executes(s -> {
                     var context = s.getContext();
                     context.reply(
@@ -87,7 +86,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
 
         ICommand<DiscordContext> test = CommandAlias.of("test", set);
 
-        return Command.literal("time", DiscordContext.class)
+        return DiscordContext.literal("time")
                 .executes(s -> {
                     s.getContext().reply(
                             """
