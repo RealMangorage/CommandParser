@@ -18,11 +18,6 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
     public ICommand<DiscordContext> create() {
 
         ICommand<DiscordContext> create = DiscordContext.literal("create")
-                .onError(s -> {
-                    s.ifErrorPresent("content", e -> e == ParseError.INCOMPLETE, s2 -> {
-                        s.getContext().reply("Content Parameter Incomplete");
-                    });
-                })
                 .executes(s -> {
                     var context = s.getContext();
 

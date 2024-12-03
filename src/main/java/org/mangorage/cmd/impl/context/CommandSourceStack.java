@@ -4,14 +4,9 @@ import org.mangorage.cmd.Util;
 import org.mangorage.cmd.api.IArgument;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.ICommandSourceStack;
-import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.cmd.impl.argument.ParseResult;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
@@ -19,7 +14,6 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         return new CommandSourceStack<>(context, args);
     }
 
-    private final Map<String, ParseError> parseErrors = new HashMap<>();
     private final S context;
     private final String[] args;
 
@@ -53,37 +47,23 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     }
 
     @Override
-    public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser) {
+    public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> type) {
         var actualType = parameters.get(id);
         if (actualType == null)
             throw new IllegalStateException("Invalid Parameter Type %s".formatted(id));
-        if (actualType != parser)
-            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getArgumentClass(), actualType.getType()));
+        if (actualType.getType() != type)
+            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(type.getArgumentClass(), actualType.getType()));
 
         try {
-            ParseResult<O> result = parser.parse(remaining);
-            if (result.getError() != null) {
-                parseErrors.put(id, result.getError());
-            }
+            ParseResult<O> result = type.parse(remaining);
+
+            // TODO: Figure out how to handle when a Optional Parameter errors?
+
             this.previousRemaining = this.remaining;
             this.remaining = result.getRemaining();
             return Optional.of(result.getResult());
         } catch (Throwable throwable) {
             return Optional.empty();
-        }
-    }
-
-    @Override
-    public Map<String, ParseError> getParsingErrors() {
-        return Map.copyOf(parseErrors);
-    }
-
-    @Override
-    public void ifErrorPresent(String id, Predicate<ParseError> predicate, Consumer<ParseError> consumer) {
-        var error = parseErrors.get(id);
-        if (error != null) {
-            if (predicate.test(error))
-                consumer.accept(error);
         }
     }
 
@@ -114,6 +94,5 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     @Override
     public void updateParameters(Map<String, IArgument<S>> parameters) {
         this.parameters = Map.copyOf(parameters);
-        this.parseErrors.clear();
     }
 }
