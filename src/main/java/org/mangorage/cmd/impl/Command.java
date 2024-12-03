@@ -1,9 +1,10 @@
 package org.mangorage.cmd.impl;
 
+import org.mangorage.cmd.api.IArgument;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandSourceStack;
-import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.IntFunction;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,9 @@ public final class Command<S> implements ICommand<S> {
     private final Consumer<ICommandSourceStack<S>> onError;
     private final Predicate<ICommandSourceStack<S>> predicate;
     private final Map<String, ICommand<S>> subCommands;
-    private final Map<String, IArgumentType<?>> parameters;
+    private final Map<String, IArgument<S>> parameters;
 
-    private Command(String id, IntFunction<ICommandSourceStack<S>> onExecute, Consumer<ICommandSourceStack<S>> onError, Predicate<ICommandSourceStack<S>> predicate, Map<String, ICommand<S>> subCommands, Map<String, IArgumentType<?>> parameters) {
+    private Command(String id, IntFunction<ICommandSourceStack<S>> onExecute, Consumer<ICommandSourceStack<S>> onError, Predicate<ICommandSourceStack<S>> predicate, Map<String, ICommand<S>> subCommands, Map<String, IArgument<S>> parameters) {
         this.id = id;
         this.onExecute = onExecute;
         this.onError = onError;
@@ -60,7 +61,7 @@ public final class Command<S> implements ICommand<S> {
     }
 
     @Override
-    public Map<String, IArgumentType<?>> getParameters() {
+    public Map<String, IArgument<S>> getArguments() {
         return Map.copyOf(parameters);
     }
 
@@ -75,7 +76,7 @@ public final class Command<S> implements ICommand<S> {
         private Consumer<ICommandSourceStack<S>> onError;
         private Predicate<ICommandSourceStack<S>> predicate;
         private final Map<String, ICommand<S>> subCommands = new HashMap<>();
-        private final Map<String, IArgumentType<?>> parameters = new HashMap<>();
+        private final Map<String, IArgument<S>> parameters = new HashMap<>();
 
         private Builder(String id) {
             this.id = id;
@@ -108,8 +109,8 @@ public final class Command<S> implements ICommand<S> {
             return this;
         }
 
-        public <P> Builder<S> withParameter(String id, IArgumentType<P> parameterType) {
-            this.parameters.put(id, parameterType);
+        public Builder<S> withArgument(IArgument<S> argument) {
+            this.parameters.put(argument.getId(), argument);
             return this;
         }
 

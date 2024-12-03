@@ -1,6 +1,7 @@
 package org.mangorage.cmd.impl.context;
 
 import org.mangorage.cmd.Util;
+import org.mangorage.cmd.api.IArgument;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.impl.argument.ParseError;
@@ -22,7 +23,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     private final S context;
     private final String[] args;
 
-    private Map<String, IArgumentType<?>> parameters;
+    private Map<String, IArgument<S>> parameters;
     private String[] remaining;
     private String[] previousRemaining;
 
@@ -37,13 +38,15 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         var actualType = parameters.get(id);
         if (actualType == null)
             throw new IllegalStateException("Invalid Parameter Type %s".formatted(id));
-        if (actualType != parser)
-            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getType(), actualType.getType()));
+        if (actualType.getType() != parser)
+            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getArgumentClass(), actualType.getType().getArgumentClass()));
 
         ParseResult<O> result = parser.parse(remaining);
+
         if (result.getError() != null) {
-            parseErrors.put(id, result.getError());
+            actualType.getErrorConsumer().accept(this, result.getError());
         }
+
         this.previousRemaining = this.remaining;
         this.remaining = result.getRemaining();
         return result.getResult();
@@ -55,7 +58,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         if (actualType == null)
             throw new IllegalStateException("Invalid Parameter Type %s".formatted(id));
         if (actualType != parser)
-            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getType(), actualType.getType()));
+            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getArgumentClass(), actualType.getType()));
 
         try {
             ParseResult<O> result = parser.parse(remaining);
@@ -109,7 +112,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
     }
 
     @Override
-    public void updateParameters(Map<String, IArgumentType<?>> parameters) {
+    public void updateParameters(Map<String, IArgument<S>> parameters) {
         this.parameters = Map.copyOf(parameters);
         this.parseErrors.clear();
     }

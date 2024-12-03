@@ -27,7 +27,7 @@ public final class ArgumentTypeImpl<O> implements IArgumentType<O> {
     }
 
     @Override
-    public Class<O> getType() {
+    public Class<O> getArgumentClass() {
         return type;
     }
 }

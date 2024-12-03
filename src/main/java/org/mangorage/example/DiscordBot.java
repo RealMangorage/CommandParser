@@ -54,7 +54,7 @@ public final class DiscordBot {
                 .build();
 
         dispatcher.register(new TimeCommand().create());
-        dispatcher.register(new TrickCommand().create());
+        //dispatcher.register(new TrickCommand().create());
 
         JDA.addEventListener(new BotListener(dispatcher));
     }

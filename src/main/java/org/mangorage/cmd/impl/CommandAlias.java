@@ -1,5 +1,6 @@
 package org.mangorage.cmd.impl;
 
+import org.mangorage.cmd.api.IArgument;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandSourceStack;
@@ -26,8 +27,8 @@ public final class CommandAlias<S> implements ICommand<S> {
     }
 
     @Override
-    public Map<String, IArgumentType<?>> getParameters() {
-        return actual.getParameters();
+    public Map<String, IArgument<S>> getArguments() {
+        return actual.getArguments();
     }
 
     @Override

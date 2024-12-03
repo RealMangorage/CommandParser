@@ -15,7 +15,7 @@ public interface ICommandSourceStack<S> {
     String[] getPreviousRemainingArgs();
     void shrinkArgs();
 
-    void updateParameters(Map<String, IArgumentType<?>> parameters);
+    void updateParameters(Map<String, IArgument<S>> parameters);
     <O> O getParameter(String id, IArgumentType<O> parser);
     <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> parser);
 

@@ -2,6 +2,7 @@ package org.mangorage.example.commands;
 
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.impl.Command;
+import org.mangorage.cmd.impl.CommandArgument;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.example.DiscordContext;
@@ -17,6 +18,7 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
 
     @Override
     public ICommand<DiscordContext> create() {
+
         ICommand<DiscordContext> create = Command.literal("create", DiscordContext.class)
                 .onError(s -> {
                     s.ifErrorPresent("content", e -> e == ParseError.INCOMPLETE, s2 -> {
@@ -27,12 +29,7 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                     var context = s.getContext();
 
                     var id = s.getParameter("id", ArgumentTypes.STRING);
-                    var tag = s.getOptionalParameter("tag", ArgumentTypes.BOOL);
                     var content = s.getParameter("content", ArgumentTypes.STRING_ALL);
-
-                    tag.ifPresent(t -> {
-                        s.getContext().reply("TAGGED");
-                    });
 
                     if (tricks.containsKey(id)) {
                         context.reply("Already have trick with id %s".formatted(id));
@@ -47,9 +44,20 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                         return 1;
                     }
                 })
-                .withParameter("id", ArgumentTypes.STRING)
-                .withParameter("tag", ArgumentTypes.BOOL)
-                .withParameter("content", ArgumentTypes.STRING_ALL)
+                .withArgument(
+                        CommandArgument.literal("id", ArgumentTypes.STRING, DiscordContext.class)
+                                .onError((s, e) -> {
+                                    s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                })
+                                .build()
+                )
+                .withArgument(
+                        CommandArgument.literal("content", ArgumentTypes.STRING_ALL, DiscordContext.class)
+                                .onError((s, e) -> {
+                                    s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                })
+                                .build()
+                )
                 .build();
 
         ICommand<DiscordContext> show = Command.literal("show", DiscordContext.class)
@@ -62,7 +70,13 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
 
                     return 1;
                 })
-                .withParameter("id", ArgumentTypes.STRING)
+                .withArgument(
+                        CommandArgument.literal("id", ArgumentTypes.STRING, DiscordContext.class)
+                                .onError((s, e) -> {
+                                    s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                })
+                                .build()
+                )
                 .build();
 
         return Command.literal("trick", DiscordContext.class)
