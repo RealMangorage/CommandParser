@@ -34,6 +34,7 @@ public final class Command<S> implements ICommand<S> {
         this.parameters = parameters;
     }
 
+    @Override
     public int execute(ICommandSourceStack<S> commandSourceStack) {
         var args = commandSourceStack.getRemainingArgs();
         commandSourceStack.updateParameters(parameters);
