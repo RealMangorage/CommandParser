@@ -3,13 +3,15 @@ package org.mangorage.example.commands;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
+import org.mangorage.example.AutoRegister;
 import org.mangorage.example.DiscordContext;
-import org.mangorage.example.api.ICommandRegistrar;
+import org.mangorage.cmd.api.ICommandRegistrar;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoRegister
 public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordContext>> {
 
     private final Map<String, String> tricks = new HashMap<>();

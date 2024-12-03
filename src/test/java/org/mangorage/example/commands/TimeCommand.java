@@ -1,17 +1,17 @@
 package org.mangorage.example.commands;
 
 import org.mangorage.cmd.api.ICommand;
-import org.mangorage.cmd.impl.Command;
 import org.mangorage.cmd.impl.CommandAlias;
-import org.mangorage.cmd.impl.CommandArgument;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.cmd.impl.misc.Validators;
+import org.mangorage.example.AutoRegister;
 import org.mangorage.example.DiscordContext;
-import org.mangorage.example.api.ICommandRegistrar;
+import org.mangorage.cmd.api.ICommandRegistrar;
 
 import java.util.List;
 
+@AutoRegister
 public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordContext>> {
 
     private int timer = 0;

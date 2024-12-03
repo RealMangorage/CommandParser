@@ -1,4 +1,4 @@
-package org.mangorage.example.api;
+package org.mangorage.cmd.api;
 
 public interface ICommandRegistrar<S> {
     S create();
