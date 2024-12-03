@@ -15,6 +15,10 @@ public final class ArgumentTypeImpl<O> implements IArgumentType<O> {
 
     @Override
     public ParseResult<O> parse(String[] args) {
+        // Do it automatically, we cant parse if null/empty anyway?
+        if (args.length == 0)
+            return new ParseResult<>(ParseError.INCOMPLETE);
+
         try {
             return function.apply(args);
         } catch (Throwable throwable) {
