@@ -1,6 +1,6 @@
 package org.mangorage.cmd.impl.context;
 
-import org.mangorage.cmd.Util;
+import org.mangorage.cmd.impl.misc.Util;
 import org.mangorage.cmd.api.IArgument;
 import org.mangorage.cmd.api.IArgumentType;
 import org.mangorage.cmd.api.ICommandSourceStack;

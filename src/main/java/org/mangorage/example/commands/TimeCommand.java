@@ -6,6 +6,7 @@ import org.mangorage.cmd.impl.CommandAlias;
 import org.mangorage.cmd.impl.CommandArgument;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
+import org.mangorage.cmd.impl.misc.Validators;
 import org.mangorage.example.DiscordContext;
 import org.mangorage.example.api.ICommandRegistrar;
 
@@ -75,7 +76,7 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 })
                 .withArgument(
                         DiscordContext.argument("seconds", ArgumentTypes.INT)
-                                .validate(i -> i >= 0 && i <= 100)
+                                .validate(Validators.intRange(0, 100))
                                 .onError((s, e) -> {
                                     if (e != ParseError.INVALID) {
                                         s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
