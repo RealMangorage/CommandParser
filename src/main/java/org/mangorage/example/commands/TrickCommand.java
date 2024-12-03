@@ -41,7 +41,11 @@ public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordCon
                         List.of(
                                 DiscordContext.argument("id", ArgumentTypes.STRING)
                                         .onError((s, e) -> {
-                                            s.getContext().reply("Error with Parameter 'content', %s".formatted(e));
+                                            if (e == ParseError.MALFORMED) {
+                                                s.getContext().reply("Error with parameter 'id', Malformed Input, Invalid for parameter type String");
+                                            } else if (e == ParseError.INCOMPLETE) {
+                                                s.getContext().reply("Error with parameter 'id', Either Incomplete or Missing");
+                                            }
                                         })
                                         .build(),
                                 DiscordContext.argument("content", ArgumentTypes.STRING_ALL)

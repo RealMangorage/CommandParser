@@ -30,7 +30,11 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 .withArgument(
                         DiscordContext.argument("seconds", ArgumentTypes.INT)
                                 .onError((s, e) -> {
-                                    s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    if (e != ParseError.INVALID) {
+                                        s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    } else {
+                                        s.getContext().reply("Parameter 'seconds' can only be within range 0 - 100");
+                                    }
                                 })
                                 .build()
                 )
@@ -49,7 +53,11 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 .withArgument(
                         DiscordContext.argument("seconds", ArgumentTypes.INT)
                                 .onError((s, e) -> {
-                                    s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    if (e != ParseError.INVALID) {
+                                        s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    } else {
+                                        s.getContext().reply("Parameter 'seconds' can only be within range 0 - 100");
+                                    }
                                 })
                                 .build()
                 )
@@ -67,8 +75,13 @@ public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordCont
                 })
                 .withArgument(
                         DiscordContext.argument("seconds", ArgumentTypes.INT)
+                                .validate(i -> i >= 0 && i <= 100)
                                 .onError((s, e) -> {
-                                    s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    if (e != ParseError.INVALID) {
+                                        s.getContext().reply("Error with Parameter 'seconds', %s".formatted(e));
+                                    } else {
+                                        s.getContext().reply("Parameter 'seconds' can only be within range 0 - 100");
+                                    }
                                 })
                                 .build()
                 )

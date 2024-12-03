@@ -8,6 +8,7 @@ import org.mangorage.cmd.api.IntFunction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Command<S> implements ICommand<S> {

@@ -1,11 +1,7 @@
 package org.mangorage.cmd.api;
 
-import org.mangorage.cmd.impl.argument.ParseError;
-
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public interface ICommandSourceStack<S> {
     String[] getArgs();

@@ -7,6 +7,7 @@ import org.mangorage.cmd.api.ICommandSourceStack;
 import org.mangorage.cmd.impl.argument.ParseResult;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
 
@@ -27,15 +28,16 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         this.remaining = args;
     }
 
+    @SuppressWarnings("all")
     @Override
-    public <O> O getParameter(String id, IArgumentType<O> parser) {
+    public <O> O getParameter(String id, IArgumentType<O> type) {
         var actualType = parameters.get(id);
         if (actualType == null)
             throw new IllegalStateException("Invalid Parameter Type %s".formatted(id));
-        if (actualType.getType() != parser)
-            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(parser.getArgumentClass(), actualType.getType().getArgumentClass()));
+        if (actualType.getType() != type)
+            throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(type.getArgumentClass(), actualType.getType().getArgumentClass()));
 
-        ParseResult<O> result = parser.parse(remaining);
+        ParseResult<O> result = type.parse((Predicate<O>) actualType.getPredicate(), remaining);
 
         if (result.getError() != null) {
             actualType.getErrorConsumer().accept(this, result.getError());
@@ -46,6 +48,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
         return result.getResult();
     }
 
+    @SuppressWarnings("all")
     @Override
     public <O> Optional<O> getOptionalParameter(String id, IArgumentType<O> type) {
         var actualType = parameters.get(id);
@@ -55,7 +58,7 @@ public final class CommandSourceStack<S> implements ICommandSourceStack<S> {
             throw new IllegalStateException("Expected Argument Type with Class of %s instead got %s".formatted(type.getArgumentClass(), actualType.getType()));
 
         try {
-            ParseResult<O> result = type.parse(remaining);
+            ParseResult<O> result = type.parse((Predicate<O>) actualType.getPredicate(), remaining);
 
             // TODO: Figure out how to handle when a Optional Parameter errors?
 
