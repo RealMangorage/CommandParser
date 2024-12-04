@@ -1,5 +1,6 @@
 package org.mangorage.example.commands;
 
+import org.mangorage.cmd.api.IAutoRegister;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.impl.CommandAlias;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
@@ -7,16 +8,26 @@ import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.cmd.impl.misc.Validators;
 import org.mangorage.example.AutoRegister;
 import org.mangorage.example.DiscordContext;
-import org.mangorage.cmd.api.ICommandRegistrar;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
-@AutoRegister
-public final class TimeCommand implements ICommandRegistrar<ICommand<DiscordContext>> {
+public final class TimeCommand {
+
+    @AutoRegister
+    public static final class AutoRegistry implements IAutoRegister<AutoRegister, ICommand<DiscordContext>> {
+
+        @Override
+        public Optional<ICommand<DiscordContext>> register(AutoRegister annotation, Consumer<Object> callback) {
+            var command = new TimeCommand();
+            callback.accept(command);
+            return Optional.of(command.create());
+        }
+    }
 
     private int timer = 0;
 
-    @Override
     public ICommand<DiscordContext> create() {
         ICommand<DiscordContext> add = DiscordContext.literal("add")
                 .executes(s -> {

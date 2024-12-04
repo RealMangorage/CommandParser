@@ -55,15 +55,9 @@ public final class DiscordBot {
                 .setEventManager(new AnnotatedEventManager())
                 .build();
 
-        dispatcher.setAutoRegistration(AutoRegister.class, (a, r) -> {
-            try {
-                return Optional.of((ICommand<DiscordContext>) r.create());
-            } catch (Throwable throwable) {
-                return Optional.empty();
-            }
+        dispatcher.autoRegister(AutoRegister.class, c -> {
+            System.out.println("Callback " + c);
         });
-
-        dispatcher.autoRegister(AutoRegister.class);
 
         JDA.addEventListener(new BotListener(dispatcher));
     }

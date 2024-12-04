@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
@@ -25,8 +26,6 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
 
     private final Map<String, ICommand<S>> commandMap = new HashMap<>();
 
-    private IAutoRegister<? extends Annotation, S> autoRegister;
-    private Class<? extends Annotation> annotationClass;
     private boolean registeredAuto = false;
 
     private CommandDispatcher() {}
@@ -36,11 +35,6 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
         commandMap.put(command.getId(), command);
     }
 
-    @Override
-    public <T extends Annotation> void setAutoRegistration(Class<T> annotationClass, IAutoRegister<T, S> autoRegistration) {
-        this.autoRegister = autoRegistration;
-        this.annotationClass = annotationClass;
-    }
 
     @Override
     public int execute(S context, String... args) {
@@ -59,9 +53,7 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
 
     @SuppressWarnings("all")
     @Override
-    public <T extends Annotation> void autoRegister(Class<T> annotationClazz) {
-        if (autoRegister == null) return;
-        if (this.annotationClass != annotationClazz) return;
+    public <T extends Annotation> void autoRegister(Class<T> annotationClazz, Consumer<Object> consumer) {
         if (registeredAuto) return;
         this.registeredAuto = true;
 
@@ -71,18 +63,19 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
 
         );
 
-        reflections.getTypesAnnotatedWith(annotationClass).forEach(clz -> {
+        reflections.getTypesAnnotatedWith(annotationClazz).forEach(clz -> {
             System.out.println("Attempting to register Class '%s' to the Dispatcher".formatted(clz));
             try {
-                ICommandRegistrar<ICommand<S>> registrar = (ICommandRegistrar<ICommand<S>>) clz.newInstance();
-                IAutoRegister<T, S> autoRegisterCasted = (IAutoRegister<T, S>) autoRegister;
-                Optional<ICommand<S>> optionalSICommand = autoRegisterCasted.register(clz.getAnnotation(annotationClazz), registrar);
+                IAutoRegister<T, ICommand<S>> registrar = (IAutoRegister<T, ICommand<S>>) clz.newInstance();
+                Optional<ICommand<S>> optionalSICommand = registrar.register(clz.getAnnotation(annotationClazz), consumer);
                 optionalSICommand.ifPresentOrElse(c -> {
                     System.out.println("Successfully registered command '%s'".formatted(c.getId()));
                     register(c);
                 }, () -> {
-                    System.out.println("Failed to register Class '%s' to the Dispatcher".formatted(clz));
+                    System.out.println("Failed to register Class '%s' to the Dispatcher, didnt recieve any command to register".formatted(clz));
                 });
+            } catch (ClassCastException e) {
+                System.out.println("Make sure your class '%s' implements %s".formatted(clz, IAutoRegister.class));
             } catch (Throwable throwable) {
                 System.out.println("Failed to register Class '%s' to the Dispatcher".formatted(clz));
             }

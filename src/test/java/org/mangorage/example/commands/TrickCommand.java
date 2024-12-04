@@ -5,18 +5,16 @@ import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
 import org.mangorage.example.AutoRegister;
 import org.mangorage.example.DiscordContext;
-import org.mangorage.cmd.api.ICommandRegistrar;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @AutoRegister
-public final class TrickCommand implements ICommandRegistrar<ICommand<DiscordContext>> {
+public final class TrickCommand {
 
     private final Map<String, String> tricks = new HashMap<>();
 
-    @Override
     public ICommand<DiscordContext> create() {
 
         ICommand<DiscordContext> create = DiscordContext.literal("create")

@@ -1,10 +1,10 @@
 package org.mangorage.cmd.api;
 
 import java.lang.annotation.Annotation;
+import java.util.function.Consumer;
 
 public interface ICommandDispatcher<S> {
     void register(ICommand<S> command);
-    <T extends Annotation> void setAutoRegistration(Class<T> annotationClass, IAutoRegister<T, S> autoRegistration);
 
     /**
      * Defgult Int Return Types:
@@ -20,5 +20,5 @@ public interface ICommandDispatcher<S> {
         return execute(context, args.split(" "));
     }
 
-    <T extends Annotation> void autoRegister(Class<T> annotationClazz);
+    <T extends Annotation> void autoRegister(Class<T> annotationClazz, Consumer<Object> consumer);
 }
