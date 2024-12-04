@@ -48,7 +48,7 @@ public final class BotListener {
                     String[] usage = dispatcher.getAllUsage(
                             node,
                             context,
-                            true
+                            false
                     );
                     event.getMessage().reply(
                             """
