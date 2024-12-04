@@ -7,6 +7,9 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://libraries.minecraft.net"
+    }
 }
 
 dependencies {
@@ -16,6 +19,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.2.1")
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'org.reflections:reflections:0.10.2'
+    implementation 'com.mojang:brigadier:1.0.500'
 }
 
 test {

@@ -1,19 +1,19 @@
 package org.mangorage.example;
 
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.mangorage.command.api.IArgumentType;
-import org.mangorage.command.impl.Command;
-import org.mangorage.command.impl.CommandArgument;
 
 public final class DiscordContext {
 
-    public static Command.CommandBuilder<DiscordContext> literal(String id) {
-        return Command.literal(id, DiscordContext.class);
+    public static LiteralArgumentBuilder<DiscordContext> literal(String id) {
+        return LiteralArgumentBuilder.literal(id);
     }
 
-    public static <T> CommandArgument.ArgumentBuilder<T, DiscordContext> argument(String id, IArgumentType<T> type) {
-        return CommandArgument.literal(id, type, DiscordContext.class);
+    public static <T> RequiredArgumentBuilder<DiscordContext, T> argument(String id, ArgumentType<T> type) {
+        return RequiredArgumentBuilder.argument(id, type);
     }
 
     private final MessageReceivedEvent event;

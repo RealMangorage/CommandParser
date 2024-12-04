@@ -2,6 +2,7 @@ package org.mangorage.example;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.brigadier.CommandDispatcher;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
@@ -9,7 +10,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.command.api.ICommandDispatcher;
-import org.mangorage.command.impl.CommandDispatcher;
+import org.mangorage.example.commands.HelpCommand;
+import org.mangorage.example.commands.TimeCommand;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,7 +28,7 @@ public final class DiscordBot {
     }
 
     private final JDA JDA;
-    private final ICommandDispatcher<DiscordContext> dispatcher = CommandDispatcher.create(DiscordContext.class);
+    private final CommandDispatcher<DiscordContext> dispatcher = new CommandDispatcher<>();
 
     public DiscordBot() throws FileNotFoundException {
         this.JDA = JDABuilder.createDefault(
@@ -51,10 +53,10 @@ public final class DiscordBot {
                 .setEventManager(new AnnotatedEventManager())
                 .build();
 
-        dispatcher.autoRegister(AutoRegister.class, c -> {
-            System.out.println("Callback " + c);
-        });
 
+
+        dispatcher.register(new HelpCommand().create());
+        dispatcher.register(new TimeCommand().create());
         JDA.addEventListener(new BotListener(dispatcher));
     }
 }
