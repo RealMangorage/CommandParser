@@ -1,14 +1,11 @@
 package org.mangorage.cmd.impl;
 
 import org.mangorage.cmd.api.IAutoRegister;
-import org.mangorage.cmd.api.ICommandRegistrar;
 import org.mangorage.cmd.impl.misc.Util;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandDispatcher;
 import org.mangorage.cmd.impl.context.CommandSourceStack;
 import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -17,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
     public static <S> CommandDispatcher<S> create(Class<S> contextClass) {
@@ -60,7 +56,6 @@ public final class CommandDispatcher<S> implements ICommandDispatcher<S> {
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
                         .setUrls(ClasspathHelper.forJavaClassPath())
-
         );
 
         reflections.getTypesAnnotatedWith(annotationClazz).forEach(clz -> {

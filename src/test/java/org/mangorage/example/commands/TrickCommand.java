@@ -1,5 +1,6 @@
 package org.mangorage.example.commands;
 
+import org.mangorage.cmd.api.IAutoRegister;
 import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.impl.argument.ArgumentTypes;
 import org.mangorage.cmd.impl.argument.ParseError;
@@ -9,11 +10,21 @@ import org.mangorage.example.DiscordContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @AutoRegister
-public final class TrickCommand {
+public final class TrickCommand implements IAutoRegister<AutoRegister, ICommand<DiscordContext>> {
 
     private final Map<String, String> tricks = new HashMap<>();
+
+    @Override
+    public Optional<ICommand<DiscordContext>> register(AutoRegister annotation, Consumer<Object> callback) {
+        var command = new TrickCommand();
+        callback.accept(command);
+        return Optional.of(command.create());
+    }
+
 
     public ICommand<DiscordContext> create() {
 

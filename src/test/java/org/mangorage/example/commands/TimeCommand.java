@@ -13,20 +13,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public final class TimeCommand {
-
-    @AutoRegister
-    public static final class AutoRegistry implements IAutoRegister<AutoRegister, ICommand<DiscordContext>> {
-
-        @Override
-        public Optional<ICommand<DiscordContext>> register(AutoRegister annotation, Consumer<Object> callback) {
-            var command = new TimeCommand();
-            callback.accept(command);
-            return Optional.of(command.create());
-        }
-    }
-
+@AutoRegister
+public final class TimeCommand implements IAutoRegister<AutoRegister, ICommand<DiscordContext>> {
     private int timer = 0;
+
+    @Override
+    public Optional<ICommand<DiscordContext>> register(AutoRegister annotation, Consumer<Object> callback) {
+        var command = new TimeCommand();
+        callback.accept(command);
+        return Optional.of(command.create());
+    }
 
     public ICommand<DiscordContext> create() {
         ICommand<DiscordContext> add = DiscordContext.literal("add")
