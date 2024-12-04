@@ -20,5 +20,5 @@ public interface ICommandDispatcher<S> {
         return execute(context, args.split(" "));
     }
 
-    void autoRegister();
+    <T extends Annotation> void autoRegister(Class<T> annotationClazz);
 }

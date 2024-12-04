@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.mangorage.cmd.api.ICommand;
 import org.mangorage.cmd.api.ICommandDispatcher;
 import org.mangorage.cmd.impl.CommandDispatcher;
 import org.mangorage.example.commands.TimeCommand;
@@ -17,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public final class DiscordBot {
     public static final Gson GSON = new GsonBuilder()
@@ -53,8 +55,15 @@ public final class DiscordBot {
                 .setEventManager(new AnnotatedEventManager())
                 .build();
 
-        dispatcher.register(new TimeCommand().create());
-        dispatcher.register(new TrickCommand().create());
+        dispatcher.setAutoRegistration(AutoRegister.class, (a, r) -> {
+            try {
+                return Optional.of((ICommand<DiscordContext>) r.create());
+            } catch (Throwable throwable) {
+                return Optional.empty();
+            }
+        });
+
+        dispatcher.autoRegister(AutoRegister.class);
 
         JDA.addEventListener(new BotListener(dispatcher));
     }
