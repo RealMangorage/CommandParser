@@ -105,8 +105,6 @@ public final class TimeCommand implements IAutoRegister<AutoRegister, ICommand<D
                 })
                 .build();
 
-        ICommand<DiscordContext> test = CommandAlias.of("test", set);
-
         return DiscordContext.literal("time")
                 .executes(s -> {
                     s.getContext().reply(
@@ -124,7 +122,7 @@ public final class TimeCommand implements IAutoRegister<AutoRegister, ICommand<D
                             remove,
                             set,
                             info,
-                            test
+                            info.createCommandAlias("test")
                         )
 
                 )

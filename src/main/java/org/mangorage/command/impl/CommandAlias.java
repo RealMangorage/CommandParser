@@ -31,6 +31,11 @@ public final class CommandAlias<S> implements ICommand<S> {
     }
 
     @Override
+    public ICommand<S> createCommandAlias(String id) {
+        return of(id, this);
+    }
+
+    @Override
     public String getId() {
         return id;
     }
