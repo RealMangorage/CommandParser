@@ -1,7 +1,7 @@
-package org.mangorage.cmd.impl.argument;
+package org.mangorage.command.impl.argument;
 
-import org.mangorage.cmd.impl.misc.Util;
-import org.mangorage.cmd.api.IArgumentType;
+import org.mangorage.command.impl.misc.Util;
+import org.mangorage.command.api.IArgumentType;
 
 public final class ArgumentTypes {
     public static final IArgumentType<Integer> INT = new ArgumentTypeImpl<>(Integer.class, p -> new ParseResult<>(

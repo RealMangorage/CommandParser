@@ -1,9 +1,9 @@
 package org.mangorage.example.commands;
 
-import org.mangorage.cmd.api.IAutoRegister;
-import org.mangorage.cmd.api.ICommand;
-import org.mangorage.cmd.impl.argument.ArgumentTypes;
-import org.mangorage.cmd.impl.argument.ParseError;
+import org.mangorage.command.api.IAutoRegister;
+import org.mangorage.command.api.ICommand;
+import org.mangorage.command.impl.argument.ArgumentTypes;
+import org.mangorage.command.impl.argument.ParseError;
 import org.mangorage.example.AutoRegister;
 import org.mangorage.example.DiscordContext;
 

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.cmd.api.ICommandDispatcher;
+import org.mangorage.command.api.ICommandDispatcher;
 
 import java.util.EnumMap;
 

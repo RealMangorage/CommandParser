@@ -1,4 +1,4 @@
-package org.mangorage.cmd.impl.argument;
+package org.mangorage.command.impl.argument;
 
 public enum ParseError {
     INCOMPLETE,

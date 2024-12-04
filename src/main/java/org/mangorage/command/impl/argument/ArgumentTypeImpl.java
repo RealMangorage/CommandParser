@@ -1,8 +1,7 @@
-package org.mangorage.cmd.impl.argument;
+package org.mangorage.command.impl.argument;
 
-import org.mangorage.cmd.api.IArgumentType;
+import org.mangorage.command.api.IArgumentType;
 
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 

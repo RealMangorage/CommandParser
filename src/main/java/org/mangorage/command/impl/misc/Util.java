@@ -1,4 +1,4 @@
-package org.mangorage.cmd.impl.misc;
+package org.mangorage.command.impl.misc;
 
 import java.util.Arrays;
 

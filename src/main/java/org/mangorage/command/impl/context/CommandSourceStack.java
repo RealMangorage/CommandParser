@@ -1,10 +1,10 @@
-package org.mangorage.cmd.impl.context;
+package org.mangorage.command.impl.context;
 
-import org.mangorage.cmd.impl.misc.Util;
-import org.mangorage.cmd.api.IArgument;
-import org.mangorage.cmd.api.IArgumentType;
-import org.mangorage.cmd.api.ICommandSourceStack;
-import org.mangorage.cmd.impl.argument.ParseResult;
+import org.mangorage.command.impl.misc.Util;
+import org.mangorage.command.api.IArgument;
+import org.mangorage.command.api.IArgumentType;
+import org.mangorage.command.api.ICommandSourceStack;
+import org.mangorage.command.impl.argument.ParseResult;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;

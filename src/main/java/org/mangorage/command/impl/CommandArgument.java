@@ -1,9 +1,9 @@
-package org.mangorage.cmd.impl;
+package org.mangorage.command.impl;
 
-import org.mangorage.cmd.api.IArgument;
-import org.mangorage.cmd.api.IArgumentType;
-import org.mangorage.cmd.api.ICommandSourceStack;
-import org.mangorage.cmd.impl.argument.ParseError;
+import org.mangorage.command.api.IArgument;
+import org.mangorage.command.api.IArgumentType;
+import org.mangorage.command.api.ICommandSourceStack;
+import org.mangorage.command.impl.argument.ParseError;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;

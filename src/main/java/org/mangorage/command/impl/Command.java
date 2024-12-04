@@ -1,14 +1,13 @@
-package org.mangorage.cmd.impl;
+package org.mangorage.command.impl;
 
-import org.mangorage.cmd.api.IArgument;
-import org.mangorage.cmd.api.ICommand;
-import org.mangorage.cmd.api.ICommandSourceStack;
-import org.mangorage.cmd.api.IntFunction;
+import org.mangorage.command.api.IArgument;
+import org.mangorage.command.api.ICommand;
+import org.mangorage.command.api.ICommandSourceStack;
+import org.mangorage.command.api.IntFunction;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Command<S> implements ICommand<S> {

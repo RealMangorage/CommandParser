@@ -1,6 +1,6 @@
-package org.mangorage.cmd.api;
+package org.mangorage.command.api;
 
-import org.mangorage.cmd.impl.argument.ParseResult;
+import org.mangorage.command.impl.argument.ParseResult;
 
 import java.util.function.Predicate;
 

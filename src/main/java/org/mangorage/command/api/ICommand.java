@@ -1,4 +1,4 @@
-package org.mangorage.cmd.api;
+package org.mangorage.command.api;
 
 import java.util.Map;
 

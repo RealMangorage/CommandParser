@@ -1,10 +1,10 @@
-package org.mangorage.cmd.impl;
+package org.mangorage.command.impl;
 
-import org.mangorage.cmd.api.IAutoRegister;
-import org.mangorage.cmd.impl.misc.Util;
-import org.mangorage.cmd.api.ICommand;
-import org.mangorage.cmd.api.ICommandDispatcher;
-import org.mangorage.cmd.impl.context.CommandSourceStack;
+import org.mangorage.command.api.IAutoRegister;
+import org.mangorage.command.impl.misc.Util;
+import org.mangorage.command.api.ICommand;
+import org.mangorage.command.api.ICommandDispatcher;
+import org.mangorage.command.impl.context.CommandSourceStack;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;

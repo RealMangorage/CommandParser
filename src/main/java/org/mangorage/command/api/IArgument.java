@@ -1,6 +1,6 @@
-package org.mangorage.cmd.api;
+package org.mangorage.command.api;
 
-import org.mangorage.cmd.impl.argument.ParseError;
+import org.mangorage.command.impl.argument.ParseError;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;

@@ -2,9 +2,9 @@ package org.mangorage.example;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.mangorage.cmd.api.IArgumentType;
-import org.mangorage.cmd.impl.Command;
-import org.mangorage.cmd.impl.CommandArgument;
+import org.mangorage.command.api.IArgumentType;
+import org.mangorage.command.impl.Command;
+import org.mangorage.command.impl.CommandArgument;
 
 public final class DiscordContext {
 

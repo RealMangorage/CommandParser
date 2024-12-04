@@ -1,4 +1,4 @@
-package org.mangorage.cmd.api;
+package org.mangorage.command.api;
 
 public interface IExecutable<T> {
     int execute(T t);
