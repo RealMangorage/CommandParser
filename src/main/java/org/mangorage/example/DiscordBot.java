@@ -55,7 +55,7 @@ public final class DiscordBot {
 
 
         dispatcher.register(new HelpCommand().create());
-        dispatcher.register(new TimeCommand().create());
+        dispatcher.register(new TimeCommand().create(JDA));
         JDA.addEventListener(new BotListener(dispatcher));
     }
 }

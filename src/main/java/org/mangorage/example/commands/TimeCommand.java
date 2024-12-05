@@ -1,44 +1,48 @@
 package org.mangorage.example.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 import org.mangorage.example.DiscordContext;
-
-import java.util.concurrent.CompletableFuture;
+import org.mangorage.example.args.UserArgumentType;
 
 
 public final class TimeCommand {
     private int timer = 0;
 
-    public LiteralArgumentBuilder<DiscordContext> create() {
+    public LiteralArgumentBuilder<DiscordContext> create(JDA jda) {
         var time = DiscordContext.literal("time")
                 .then(
                         DiscordContext.literal("set")
-
                                 .then(
-                                        DiscordContext.argument("seconds", IntegerArgumentType.integer(0, 100))
+                                        DiscordContext.argument("seconds", IntegerArgumentType.integer(0, 20))
                                                 .executes(c -> {
-                                                    c.getSource().reply("%s set Timer to %s seconds".formatted(c.getSource().getUser().getName(), c.getArgument("seconds", Integer.class)));
+                                                    c.getSource().reply(
+                                                            """
+                                                            Set Timer to %s for %s
+                                                            """.formatted(
+                                                                    c.getArgument("seconds", Integer.class),
+                                                                    c.getSource().getUser().getName()
+                                                            )
+                                                    );
                                                     return 1;
                                                 })
+                                                .build()
+                                )
+                                .then(
+                                        DiscordContext.argument("user", UserArgumentType.globalUser(jda))
                                                 .then(
-                                                        DiscordContext.argument("optional", StringArgumentType.string())
-                                                                .requires(c -> c.getUser().getIdLong() != 194596094200643584L)
-                                                                .suggests(new SuggestionProvider<DiscordContext>() {
-                                                                    @Override
-                                                                    public CompletableFuture<Suggestions> getSuggestions(CommandContext<DiscordContext> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-                                                                        builder.suggest("LOL");
-                                                                        return builder.buildFuture();
-                                                                    }
-                                                                })
+                                                        DiscordContext.argument("seconds", IntegerArgumentType.integer(0, 20))
                                                                 .executes(c -> {
-                                                                    c.getSource().reply("Value " + c.getArgument("optional", String.class));
+                                                                    c.getSource().reply(
+                                                                            """
+                                                                            Set Timer to %s for %s
+                                                                            """.formatted(
+                                                                                    c.getArgument("seconds", Integer.class),
+                                                                                    c.getArgument("user", User.class).getName()
+                                                                            )
+                                                                    );
                                                                     return 1;
                                                                 })
                                                                 .build()

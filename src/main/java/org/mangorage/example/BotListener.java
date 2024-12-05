@@ -39,11 +39,12 @@ public final class BotListener {
             try {
                 int result = dispatcher.execute(parsed);
             } catch (CommandSyntaxException e) {
-                var node =  dispatcher.findNode(
+                var node = dispatcher.findNode(
                         List.of(
                                 message.substring(1)
                         )
                 );
+
                 if (node != null) {
                     String[] usage = dispatcher.getAllUsage(
                             node,
