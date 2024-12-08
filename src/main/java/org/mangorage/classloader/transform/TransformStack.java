@@ -2,6 +2,7 @@ package org.mangorage.classloader.transform;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 public class TransformStack {
 
@@ -10,25 +11,29 @@ public class TransformStack {
     }
 
     private final byte[] original;
-    private Deque<byte[]> modified = new ArrayDeque<>();
+    private Deque<TransformResult> modified = new ArrayDeque<>();
 
     private TransformStack(byte[] original) {
         this.original = original;
     }
 
-    public void push(byte[] bytes) {
-        this.modified.push(bytes);
+    public void push(TransformResult result) {
+        this.modified.push(result);
     }
 
     public byte[] getOriginal() {
         return original;
     }
 
-    public byte[] getModified() {
-        return modified.pop();
+    public TransformResult getModified() {
+        return modified.peek();
     }
 
     public byte[] getModifiedOrOriginal() {
-        return modified.isEmpty() ? getOriginal() : getModified();
+        return modified.isEmpty() ? getOriginal() : getModified().result();
+    }
+
+    public List<TransformResult> getHistory() {
+        return modified.stream().toList();
     }
 }

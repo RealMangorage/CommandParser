@@ -1,14 +1,12 @@
 package org.mangorage.classloader;
 
 import org.mangorage.classloader.transform.ITransformer;
+import org.mangorage.classloader.transform.TransformResult;
 import org.mangorage.classloader.transform.TransformStack;
+import org.mangorage.classloader.transform.TransformedClass;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.classfile.ClassBuilder;
-import java.lang.classfile.ClassFile;
-import java.lang.classfile.ClassModel;
-import java.lang.constant.ClassDesc;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -17,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 public class CustomizedClassloader extends URLClassLoader {
     static {
@@ -32,12 +30,18 @@ public class CustomizedClassloader extends URLClassLoader {
         return new Builder(null);
     }
 
+
     private final Map<String, Class<?>> classMap = new HashMap<>();
+    private final Map<String, TransformedClass> transformedClassMap = new HashMap<>();
     private final List<ITransformer> transformers;
 
     public CustomizedClassloader(URL[] urls, ClassLoader parent, List<ITransformer> transformers) {
         super(urls, parent);
         this.transformers = List.copyOf(transformers);
+    }
+
+    public List<TransformResult> getTransformedInfo(String name) {
+        return transformedClassMap.containsKey(name) ? transformedClassMap.get(name).results() : List.of();
     }
 
     public byte[] getClassBytes(String className) throws IOException {
@@ -61,8 +65,8 @@ public class CustomizedClassloader extends URLClassLoader {
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         if (transformers.isEmpty())
             return findAndStoreClass(name);
-        if (classMap.containsKey(name))
-            return classMap.get(name);
+        if (transformedClassMap.containsKey(name))
+            return transformedClassMap.get(name).modifiedClass();
 
         try {
             List<ITransformer> transformersRemain = transformers.stream()
@@ -80,7 +84,7 @@ public class CustomizedClassloader extends URLClassLoader {
             transformersRemain.forEach(t -> t.transform(stack));
 
             Class<?> clazz = defineClass(name, stack.getModifiedOrOriginal());
-            classMap.put(name, clazz);
+            transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
             return clazz;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -116,6 +120,18 @@ public class CustomizedClassloader extends URLClassLoader {
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public CustomizedClassloader buildAndThenActivate(String clazz) {
+            var cl = build();
+            var parent = Thread.currentThread().getContextClassLoader().getParent();
+            try {
+                Thread.currentThread().setContextClassLoader(cl);
+                Class.forName(clazz, false, cl).newInstance();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            return cl;
         }
 
         public CustomizedClassloader build() {
