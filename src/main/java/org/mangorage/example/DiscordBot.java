@@ -11,9 +11,14 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.example.commands.HelpCommand;
 import org.mangorage.example.commands.TimeCommand;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.annotation.Retention;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -51,8 +56,6 @@ public final class DiscordBot {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setEventManager(new AnnotatedEventManager())
                 .build();
-
-
 
         dispatcher.register(new HelpCommand().create());
         dispatcher.register(new TimeCommand().create(JDA));
