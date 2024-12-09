@@ -1,4 +1,4 @@
-package org.mangorage.classloader;
+package org.mangorage.classloader.misc;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

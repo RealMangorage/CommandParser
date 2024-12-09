@@ -1,4 +1,4 @@
-package org.mangorage.example;
+package org.mangorage.command.example;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,16 +9,11 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.example.commands.HelpCommand;
-import org.mangorage.example.commands.TimeCommand;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
+import org.mangorage.command.example.commands.HelpCommand;
+import org.mangorage.command.example.commands.TimeCommand;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.lang.annotation.Retention;
 import java.nio.file.Path;
 import java.util.List;
 

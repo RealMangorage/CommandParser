@@ -1,4 +1,4 @@
-package org.mangorage.example.args;
+package org.mangorage.command.example.args;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

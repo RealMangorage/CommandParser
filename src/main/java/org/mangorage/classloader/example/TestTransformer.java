@@ -1,11 +1,10 @@
 package org.mangorage.classloader.example;
 
-import org.mangorage.classloader.Utils;
+import org.mangorage.classloader.misc.Utils;
 import org.mangorage.classloader.transform.ITransformer;
 import org.mangorage.classloader.transform.TransformResult;
 import org.mangorage.classloader.transform.TransformStack;
 
-import java.io.IOException;
 import java.lang.classfile.ClassFile;
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
@@ -15,10 +14,9 @@ import java.lang.constant.ConstantDescs;
 import java.lang.constant.DynamicCallSiteDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.invoke.StringConcatFactory;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 
+@SuppressWarnings("preview")
 public class TestTransformer implements ITransformer {
     @Override
     public void transform(TransformStack stack) {
@@ -65,7 +63,7 @@ public class TestTransformer implements ITransformer {
                         ClassTransform.transformingMethods(it -> it.methodName().equalsString("createCombined"),
                                 MethodTransform.endHandler(mb -> {
                                     mb.withCode(cb -> {
-                                        Utils.createRecordByteCode(cb, ClassDesc.of("org.mangorage.testcl.Combined"), 3, ConstantDescs.CD_String, ConstantDescs.CD_String, ConstantDescs.CD_String);
+                                        Utils.createRecordByteCode(cb, ClassDesc.of("org.mangorage.testcl.asmstuff.Combined"), 3, ConstantDescs.CD_String, ConstantDescs.CD_String, ConstantDescs.CD_String);
                                     });
                                 })
                         )
@@ -74,14 +72,6 @@ public class TestTransformer implements ITransformer {
 
         ClassFile.of().verify(clazz);
 
-        try {
-            Files.write(
-                    Path.of("Test.class"),
-                    clazz
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         stack.push(
                 new TransformResult(
                         getClass(),
@@ -93,7 +83,7 @@ public class TestTransformer implements ITransformer {
 
     @Override
     public boolean handlesClass(String clazz) {
-        return Objects.equals(clazz, "org.mangorage.testcl.Test");
+        return Objects.equals(clazz, "org.mangorage.testcl.asmstuff.Test");
     }
 
     @Override

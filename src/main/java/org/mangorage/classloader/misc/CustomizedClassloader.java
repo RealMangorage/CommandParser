@@ -1,9 +1,12 @@
-package org.mangorage.classloader;
+package org.mangorage.classloader.misc;
 
 import org.mangorage.classloader.transform.ITransformer;
+import org.mangorage.classloader.transform.ITransformerFinder;
 import org.mangorage.classloader.transform.TransformResult;
 import org.mangorage.classloader.transform.TransformStack;
 import org.mangorage.classloader.transform.TransformedClass;
+import org.mangorage.classloader.transform.finders.EmptyTransformerFinder;
+import org.mangorage.classloader.transform.finders.JavaTransformerFinder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class CustomizedClassloader extends URLClassLoader {
     static {
@@ -33,11 +35,11 @@ public class CustomizedClassloader extends URLClassLoader {
 
     private final Map<String, Class<?>> classMap = new HashMap<>();
     private final Map<String, TransformedClass> transformedClassMap = new HashMap<>();
-    private final List<ITransformer> transformers;
+    private final ITransformerFinder finder;
 
-    public CustomizedClassloader(URL[] urls, ClassLoader parent, List<ITransformer> transformers) {
+    public CustomizedClassloader(URL[] urls, ClassLoader parent, ITransformerFinder finder) {
         super(urls, parent);
-        this.transformers = List.copyOf(transformers);
+        this.finder = finder;
     }
 
     public List<TransformResult> getTransformedInfo(String name) {
@@ -63,13 +65,13 @@ public class CustomizedClassloader extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        if (transformers.isEmpty())
+        if (finder.findAndCacheTransformers().isEmpty())
             return findAndStoreClass(name);
         if (transformedClassMap.containsKey(name))
             return transformedClassMap.get(name).modifiedClass();
 
         try {
-            List<ITransformer> transformersRemain = transformers.stream()
+            List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
                     .filter(t -> t.handlesClass(name))
                     .toList();
 
@@ -99,6 +101,7 @@ public class CustomizedClassloader extends URLClassLoader {
         private final List<ITransformer> transformers = new ArrayList<>();
         private final List<URL> urls = new ArrayList<>();
         private final ClassLoader parent;
+        private ITransformerFinder transformerFinder = EmptyTransformerFinder.INSTANCE;
 
         private Builder(ClassLoader parent) {
             this.parent = parent;
@@ -106,6 +109,13 @@ public class CustomizedClassloader extends URLClassLoader {
 
         public Builder addTransformer(ITransformer transformer) {
             this.transformers.add(transformer);
+            if (this.transformerFinder == EmptyTransformerFinder.INSTANCE)
+                setTransformerLocator(new JavaTransformerFinder());
+            return this;
+        }
+
+        public Builder setTransformerLocator(ITransformerFinder finder) {
+            this.transformerFinder = finder == null ? EmptyTransformerFinder.INSTANCE : finder;
             return this;
         }
 
@@ -135,10 +145,11 @@ public class CustomizedClassloader extends URLClassLoader {
         }
 
         public CustomizedClassloader build() {
+            transformerFinder.loadDefaultTransformers(transformers);
             return new CustomizedClassloader(
                     urls.toArray(URL[]::new),
                     parent,
-                    transformers
+                    transformerFinder
             );
         }
 

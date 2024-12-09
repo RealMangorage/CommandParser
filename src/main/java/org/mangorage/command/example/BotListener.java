@@ -1,4 +1,4 @@
-package org.mangorage.example;
+package org.mangorage.command.example;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;

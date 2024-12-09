@@ -1,4 +1,4 @@
-package org.mangorage.testcl;
+package org.mangorage.testcl.asmstuff;
 
 public class Test {
     public String create(String id, String indeed, String woop) {

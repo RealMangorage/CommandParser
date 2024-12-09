@@ -1,7 +1,7 @@
-package org.mangorage.example.commands;
+package org.mangorage.command.example.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import org.mangorage.example.DiscordContext;
+import org.mangorage.command.example.DiscordContext;
 
 public class HelpCommand {
     public LiteralArgumentBuilder<DiscordContext> create() {

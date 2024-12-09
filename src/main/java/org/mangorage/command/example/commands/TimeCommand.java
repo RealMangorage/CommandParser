@@ -1,4 +1,4 @@
-package org.mangorage.example.commands;
+package org.mangorage.command.example.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -6,11 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
-import org.mangorage.example.DiscordContext;
-import org.mangorage.example.args.UserArgumentType;
+import org.mangorage.command.example.DiscordContext;
+import org.mangorage.command.example.args.UserArgumentType;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 
 public final class TimeCommand {
