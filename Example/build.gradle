@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.0.0'  // Shadow plugin for creating the fat JAR
 }
 
 group = 'org.mangorage'
@@ -12,8 +13,32 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation 'org.reflections:reflections:0.10.2'
+
+    implementation(rootProject.project(":core"))
 }
 
 test {
     useJUnitPlatform()
+}
+
+compileJava {
+    options.compilerArgs += ['--enable-preview']
+}
+
+
+task runMain(type: JavaExec) {
+    jvmArgs = ['--enable-preview']  // Add --enable-preview to run with preview features enabled
+    main = 'org.mangorage.testcl.ClassloaderTest'  // Replace with your main class path
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.mangorage.testcl.ClassloaderTest', // Specify the main class for running the JAR
+                'Created-By': 'Gradle'            // Add any custom attributes
+        )
+    }
 }

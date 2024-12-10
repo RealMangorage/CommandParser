@@ -1,0 +1,5 @@
+# Math Test Transformer
+transformer org.mangorage.testcl.example.transformers.MathTestTransformer
+
+# Test Transformer
+transformer org.mangorage.testcl.example.transformers.TestTransformer

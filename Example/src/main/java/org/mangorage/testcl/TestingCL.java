@@ -4,7 +4,10 @@ import org.mangorage.testcl.asmstuff.MathTest;
 import org.mangorage.testcl.asmstuff.Test;
 
 public class TestingCL {
-    public TestingCL() {
+    public TestingCL() throws ClassNotFoundException {
+
+        Class.forName(Object.class.getName(), false, Thread.currentThread().getContextClassLoader());
+
         System.out.println(
                 new Test()
                         .create("COOL", "ALR", "WHAT")

@@ -1,3 +1,4 @@
 rootProject.name = 'CMDParser'
 include 'Example'
+include 'core'
 
