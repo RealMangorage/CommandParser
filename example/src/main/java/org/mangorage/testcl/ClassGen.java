@@ -9,6 +9,7 @@ import java.lang.classfile.ClassFile;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -20,6 +21,14 @@ public class ClassGen implements IClassGenerator {
         var bytes = file.build(
                 clazz,
                 cb -> {
+                    cb.withInterfaces(
+                            cb.constantPool()
+                                    .classEntry(
+                                            ClassDesc.of("org.mangorage.Test")
+                                    )
+                    );
+
+
                     cb.withMethod(
                             "<init>",
                             MethodTypeDesc.of(

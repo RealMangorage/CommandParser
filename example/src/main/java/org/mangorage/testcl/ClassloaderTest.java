@@ -1,44 +1,32 @@
 package org.mangorage.testcl;
 
-
 import org.mangorage.classloader.CustomizedClassloader;
-import org.mangorage.classloader.features.locators.DefaultTransformerLocator;
-import org.mangorage.testcl.example.transformers.MathTestTransformer;
-import org.mangorage.testcl.example.transformers.TestTransformer;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import org.mangorage.classloader.example.transformers.MathTestTransformer;
+import org.mangorage.classloader.example.transformers.TestTransformer;
 
 public class ClassloaderTest {
-    public static void main(String[] args) throws InterruptedException, InstantiationException, IllegalAccessException {
-        System.out.println("Detected Class Path");
-        System.out.println("---------------------------------------------------------");
-        System.out.println(
-                Arrays.stream(System.getProperty("java.class.path").split(";"))
-                        .collect(Collectors.joining("\n"))
-        );
-        System.out.println("---------------------------------------------------------");
+    public static void main(String[] args) throws InterruptedException {
 
-        ClassLoader parent = Thread.currentThread().getContextClassLoader().getParent();
-        CustomizedClassloader cl = CustomizedClassloader.of(parent)
+
+
+        var cl = CustomizedClassloader.of(Thread.currentThread().getContextClassLoader().getParent())
                 .withJavaClasspath()
-                .addTransformer(new MathTestTransformer())
                 .addTransformer(new TestTransformer())
-                .addClassGenerator(new ClassGen())
-                .build();
-
+                .addTransformer(new MathTestTransformer())
+                .buildWithBootstrap();
 
         try {
-            Thread.currentThread().setContextClassLoader(cl);
-            Class.forName("org.mangorage.testcl.TestingCL", false, cl).newInstance();
+
+            Class.forName(
+                    "org.mangorage.testcl.TestingCL",
+                    false,
+                    cl
+            ).newInstance();
         } catch (Throwable e) {
             e.printStackTrace();
         }
 
         Thread.sleep(10000);
 
-        cl.getTransformedInfo("org.mangorage.testcl.Test").forEach(result -> {
-            System.out.println(result.name());
-        });
     }
 }

@@ -1,4 +1,4 @@
-package org.mangorage.testcl.example.transformers;
+package org.mangorage.classloader.example.transformers;
 
 import org.mangorage.classloader.features.transformers.ITransformer;
 import org.mangorage.classloader.features.transformers.TransformResult;

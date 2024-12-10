@@ -1,5 +1,4 @@
 rootProject.name = 'CMDParser'
 include 'example'
 include 'core'
-include 'bootstrap'
 

@@ -19,7 +19,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ import java.util.Map;
 @SuppressWarnings("preview")
 public class CustomizedClassloader extends URLClassLoader {
     static {
-        ClassLoader.registerAsParallelCapable();
+
     }
 
     public static Builder of(ClassLoader parent) {
@@ -60,7 +59,7 @@ public class CustomizedClassloader extends URLClassLoader {
     }
 
     public byte[] getClassBytes(String className) throws IOException {
-        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(className.replace('.', '/') + ".class");
+        InputStream is = getResourceAsStream(className.replace('.', '/') + ".class");
         byte[] buffer = new byte[is.available()];
         is.read(buffer);
         is.close();
@@ -70,13 +69,14 @@ public class CustomizedClassloader extends URLClassLoader {
     private Class<?> findAndStoreClass(String name) throws ClassNotFoundException {
         if (classMap.containsKey(name))
             return classMap.get(name);
-        Class<?> clazz = Class.forName(name);
+        Class<?> clazz = super.findClass(name);
         classMap.put(name, clazz);
         return clazz;
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    public Class<?> findClass(String name) throws ClassNotFoundException {
+        System.out.println(name + " -> Customized");
         if (finder.findAndCacheTransformers().isEmpty())
             return findAndStoreClass(name);
         if (transformedClassMap.containsKey(name))
@@ -101,44 +101,13 @@ public class CustomizedClassloader extends URLClassLoader {
             transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
             return clazz;
         } catch (Exception e) {
-            return Class.forName(name);
+            throw new IllegalStateException(e);
         }
     }
 
     private Class<?> defineClass(String name, byte[] bytes) {
         return super.defineClass(name, bytes, 0, bytes.length);
     }
-
-    @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (finder.findAndCacheTransformers().isEmpty())
-            return findAndStoreClass(name);
-        if (transformedClassMap.containsKey(name))
-            return transformedClassMap.get(name).modifiedClass();
-
-        try {
-            List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
-                    .filter(t -> t.handlesClass(name))
-                    .toList();
-
-            if (transformersRemain.isEmpty())
-                return findAndStoreClass(name);
-
-            byte[] original = getClassBytes(name);
-            if (original == null)
-                throw new IllegalStateException("Class Bytes were null for class " + name);
-
-            TransformStack stack = TransformStack.of(original);
-            transformersRemain.forEach(t -> t.transform(classFile, stack));
-
-            Class<?> clazz = defineClass(name, stack.getModifiedOrOriginal());
-            transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
-            return clazz;
-        } catch (Exception e) {
-            return Class.forName(name);
-        }
-    }
-
 
 
     public static class Builder {
@@ -211,7 +180,6 @@ public class CustomizedClassloader extends URLClassLoader {
 
         public CustomizedClassloader build() {
             transformerFinder.loadDefaultTransformers(transformers);
-            transformerFinder.findAndCacheTransformers();
             return new CustomizedClassloader(
                     urls.toArray(URL[]::new),
                     parent,
@@ -220,5 +188,15 @@ public class CustomizedClassloader extends URLClassLoader {
             );
         }
 
+
+        public CustomizedClassloader buildWithBootstrap() {
+            CustomizedClassloader rcl = build();
+            try (var cl = new URLClassLoader(urls.toArray(new URL[0]), rcl)) {
+                Thread.currentThread().setContextClassLoader(cl);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            return rcl;
+        }
     }
 }
