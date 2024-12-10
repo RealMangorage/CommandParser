@@ -3,6 +3,8 @@ package org.mangorage.testcl;
 
 import org.mangorage.classloader.CustomizedClassloader;
 import org.mangorage.classloader.features.locators.DefaultTransformerLocator;
+import org.mangorage.testcl.example.transformers.MathTestTransformer;
+import org.mangorage.testcl.example.transformers.TestTransformer;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -20,8 +22,9 @@ public class ClassloaderTest {
         ClassLoader parent = Thread.currentThread().getContextClassLoader().getParent();
         CustomizedClassloader cl = CustomizedClassloader.of(parent)
                 .withJavaClasspath()
+                .addTransformer(new MathTestTransformer())
+                .addTransformer(new TestTransformer())
                 .addClassGenerator(new ClassGen())
-                .setTransformerLocator(new DefaultTransformerLocator("services/default.transformers"))
                 .build();
 
 

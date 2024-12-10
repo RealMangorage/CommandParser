@@ -109,6 +109,36 @@ public class CustomizedClassloader extends URLClassLoader {
         return super.defineClass(name, bytes, 0, bytes.length);
     }
 
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (finder.findAndCacheTransformers().isEmpty())
+            return findAndStoreClass(name);
+        if (transformedClassMap.containsKey(name))
+            return transformedClassMap.get(name).modifiedClass();
+
+        try {
+            List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
+                    .filter(t -> t.handlesClass(name))
+                    .toList();
+
+            if (transformersRemain.isEmpty())
+                return findAndStoreClass(name);
+
+            byte[] original = getClassBytes(name);
+            if (original == null)
+                throw new IllegalStateException("Class Bytes were null for class " + name);
+
+            TransformStack stack = TransformStack.of(original);
+            transformersRemain.forEach(t -> t.transform(classFile, stack));
+
+            Class<?> clazz = defineClass(name, stack.getModifiedOrOriginal());
+            transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
+            return clazz;
+        } catch (Exception e) {
+            return Class.forName(name);
+        }
+    }
+
 
 
     public static class Builder {
@@ -148,16 +178,14 @@ public class CustomizedClassloader extends URLClassLoader {
         public Builder withJavaClasspath() {
             String[] classPath = System.getProperty("java.class.path").split(";");
             if (classPath.length >= 2) {
-                addUrl(
-                        Path.of(
-                                classPath[0]
-                        )
-                );
-                addUrl(
-                        Path.of(
-                                classPath[1]
-                        )
-                );
+                for (String s : classPath) {
+                    addUrl(
+                            Path.of(
+                                    s
+                            )
+                    );
+                    System.out.println(s);
+                }
             } else if (classPath.length == 1){
                 addUrl(
                         Path.of(

@@ -23,15 +23,16 @@ test {
     useJUnitPlatform()
 }
 
-compileJava {
-    options.compilerArgs += ['--enable-preview']
+tasks.withType(JavaCompile) {
+    options.compilerArgs += '--enable-preview'
 }
 
+tasks.withType(Test) {
+    jvmArgs '--enable-preview'
+}
 
-task runMain(type: JavaExec) {
-    jvmArgs = ['--enable-preview']  // Add --enable-preview to run with preview features enabled
-    main = 'org.mangorage.testcl.ClassloaderTest'  // Replace with your main class path
-    classpath = sourceSets.main.runtimeClasspath
+tasks.withType(JavaExec) {
+    jvmArgs '--enable-preview'
 }
 
 jar {

@@ -4,10 +4,7 @@ import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.stream.Stream;
 
 @SuppressWarnings("preview")
 public class Utils {
@@ -32,11 +29,13 @@ public class Utils {
         cb.areturn();
     }
 
-    public static List<URL> findAllFilesInClasspath(String fileName) {
+    public static List<String> getAllFileContent(String fileName) {
         try {
-            Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-
-            return List.of();
+            return List.of(
+                new String(
+                        Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName).readAllBytes()
+                )
+            );
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
