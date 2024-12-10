@@ -26,7 +26,7 @@ import java.util.Map;
 @SuppressWarnings("preview")
 public class CustomizedClassloader extends URLClassLoader {
     static {
-
+        ClassLoader.registerAsParallelCapable();
     }
 
     public static Builder of(ClassLoader parent) {

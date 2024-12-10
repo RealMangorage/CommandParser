@@ -4,11 +4,11 @@ import org.mangorage.testcl.asmstuff.MathTest;
 import org.mangorage.testcl.asmstuff.Test;
 
 public class TestingCL {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         new TestingCL();
     }
 
-    public TestingCL() {
+    public TestingCL() throws Throwable {
         System.out.println("OK LOADED TESTINGG CL");
         System.out.println(
                 new Test()
@@ -17,8 +17,7 @@ public class TestingCL {
 
         System.out.println(
                 new MathTest()
-                        .calculate(1, 209)
+                        .calculate(210, 10)
         );
-
     }
 }

@@ -1,8 +1,8 @@
 package org.mangorage.testcl;
 
 import org.mangorage.classloader.CustomizedClassloader;
-import org.mangorage.classloader.example.transformers.MathTestTransformer;
-import org.mangorage.classloader.example.transformers.TestTransformer;
+import org.mangorage.testcl.example.transformers.MathTestTransformer;
+import org.mangorage.testcl.example.transformers.TestTransformer;
 
 public class ClassloaderTest {
     public static void main(String[] args) throws InterruptedException {
