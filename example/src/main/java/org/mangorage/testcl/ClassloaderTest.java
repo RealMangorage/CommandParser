@@ -1,8 +1,7 @@
 package org.mangorage.testcl;
 
 import org.mangorage.classloader.CustomizedClassloader;
-import org.mangorage.testcl.example.transformers.MathTestTransformer;
-import org.mangorage.testcl.example.transformers.TestTransformer;
+import org.mangorage.classloader.features.transformers.impl.MethodHandleTransformer;
 
 public class ClassloaderTest {
     public static void main(String[] args) throws InterruptedException {
@@ -11,8 +10,8 @@ public class ClassloaderTest {
 
         var cl = CustomizedClassloader.of(Thread.currentThread().getContextClassLoader().getParent())
                 .withJavaClasspath()
-                .addTransformer(new TestTransformer())
-                .addTransformer(new MathTestTransformer())
+                .addClassGenerator(new ClassGen())
+                .addTransformer(new MethodHandleTransformer())
                 .buildWithBootstrap();
 
         try {

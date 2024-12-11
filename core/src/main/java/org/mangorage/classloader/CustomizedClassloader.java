@@ -42,16 +42,15 @@ public class CustomizedClassloader extends URLClassLoader {
 
     private final Map<String, Class<?>> classMap = new HashMap<>();
     private final Map<String, TransformedClass> transformedClassMap = new HashMap<>();
+    private final List<IClassGenerator> classGenerators;
     private final ITransformerLocator finder;
+
+    private boolean generated = false;
 
     public CustomizedClassloader(URL[] urls, ClassLoader parent, ITransformerLocator finder, List<IClassGenerator> classGenerators) {
         super(urls, parent);
         this.finder = finder;
-        classGenerators.forEach(cg -> {
-            var unbaked = cg.generate(classFile);
-            var clz = defineClass(unbaked.name(), unbaked.bytes());
-            System.out.println("Successfully Generated " + clz);
-        });
+        this.classGenerators = classGenerators;
     }
 
     public List<TransformResult> getTransformedInfo(String name) {
@@ -76,6 +75,15 @@ public class CustomizedClassloader extends URLClassLoader {
 
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
+        if (!generated) {
+            generated = true;
+            classGenerators.forEach(cg -> {
+                var unbaked = cg.generate(classFile);
+                var clz = defineClass(unbaked.name(), unbaked.bytes());
+                System.out.println("Successfully Generated " + clz);
+            });
+        }
+
         System.out.println(name + " -> Customized");
         if (finder.findAndCacheTransformers().isEmpty())
             return findAndStoreClass(name);
@@ -83,16 +91,17 @@ public class CustomizedClassloader extends URLClassLoader {
             return transformedClassMap.get(name).modifiedClass();
 
         try {
+            byte[] original = getClassBytes(name);
+            if (original == null)
+                throw new IllegalStateException("Class Bytes were null for class " + name);
+
+
             List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
-                    .filter(t -> t.handlesClass(name))
+                    .filter(t -> t.handlesClass(classFile.parse(original)))
                     .toList();
 
             if (transformersRemain.isEmpty())
                 return findAndStoreClass(name);
-
-            byte[] original = getClassBytes(name);
-            if (original == null)
-                throw new IllegalStateException("Class Bytes were null for class " + name);
 
             TransformStack stack = TransformStack.of(original);
             transformersRemain.forEach(t -> t.transform(classFile, stack));

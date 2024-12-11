@@ -21,14 +21,6 @@ public class ClassGen implements IClassGenerator {
         var bytes = file.build(
                 clazz,
                 cb -> {
-                    cb.withInterfaces(
-                            cb.constantPool()
-                                    .classEntry(
-                                            ClassDesc.of("org.mangorage.Test")
-                                    )
-                    );
-
-
                     cb.withMethod(
                             "<init>",
                             MethodTypeDesc.of(

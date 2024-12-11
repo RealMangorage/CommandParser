@@ -84,8 +84,8 @@ public class MathTestTransformer implements ITransformer {
     }
 
     @Override
-    public boolean handlesClass(String clazz) {
-        return clazz.equals("org.mangorage.testcl.asmstuff.MathTest");
+    public boolean handlesClass(ClassModel classModel) {
+        return false;
     }
 
     @Override
