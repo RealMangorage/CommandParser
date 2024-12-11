@@ -74,16 +74,21 @@ public class CustomizedClassloader extends URLClassLoader {
 
     public Class<?> tryGenerateAndTransformClass(List<ITransformer> transformers, String name, byte[] original) throws ClassNotFoundException {
         if (transformers.isEmpty()) return defineClass(name, original);
-        return tryTransformClass(transformers, name, original);
+        return tryTransformClass(transformers, name, original, true);
     }
 
-    public Class<?> tryTransformClass(List<ITransformer> transformers, String name, byte[] original) throws ClassNotFoundException {
+    public Class<?> tryTransformClass(List<ITransformer> transformers, String name, byte[] original, boolean defineInsteadOfFind) throws ClassNotFoundException {
         List<ITransformer> transformersFiltered = transformers.stream()
                 .filter(t -> t.handlesClass(classFile.parse(original)))
                 .toList();
 
-        if (transformersFiltered.isEmpty())
-            return findAndStoreClass(name);
+        if (transformersFiltered.isEmpty()) {
+            if (defineInsteadOfFind) {
+                return defineClass(name, original);
+            } else {
+                return findAndStoreClass(name);
+            }
+        }
 
         TransformStack stack = TransformStack.of(original);
         transformersFiltered.forEach(t -> t.transform(classFile, stack));
@@ -114,7 +119,7 @@ public class CustomizedClassloader extends URLClassLoader {
             return findAndStoreClass(name);
 
         try {
-            return transformedClassMap.containsKey(name) ? transformedClassMap.get(name).modifiedClass() : tryTransformClass(transformers, name, getClassBytes(name));
+            return transformedClassMap.containsKey(name) ? transformedClassMap.get(name).modifiedClass() : tryTransformClass(transformers, name, getClassBytes(name), false);
         } catch (Throwable e) {
             throw new IllegalStateException("Failed to get Class Bytes for class " + name, e);
         }
