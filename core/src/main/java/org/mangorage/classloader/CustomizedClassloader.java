@@ -59,7 +59,7 @@ public class CustomizedClassloader extends URLClassLoader {
 
     public byte[] getClassBytes(String className) throws IOException {
         try (InputStream is = getResourceAsStream(className.replace('.', '/') + ".class")) {
-            if (is != null) throw new IllegalStateException("Class %s not found".formatted(className));
+            if (is == null) throw new IllegalStateException("Class %s not found".formatted(className));
             return is.readAllBytes();
         }
     }
