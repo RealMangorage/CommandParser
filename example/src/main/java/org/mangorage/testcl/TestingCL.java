@@ -1,6 +1,5 @@
 package org.mangorage.testcl;
 
-
 public class TestingCL {
     public TestingCL() throws Throwable {
         if (Class.forName("org.mangorage.testOk").newInstance() instanceof TestInvoker invoker) {

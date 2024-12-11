@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class CustomizedClassloader extends URLClassLoader {
     }
 
     public List<TransformResult> getTransformedInfo(String name) {
-        return transformedClassMap.containsKey(name) ? transformedClassMap.get(name).results() : List.of();
+        return transformedClassMap.containsKey(name) ? transformedClassMap.get(name).results() : Collections.emptyList();
     }
 
     public byte[] getClassBytes(String className) throws IOException {
@@ -95,7 +96,7 @@ public class CustomizedClassloader extends URLClassLoader {
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
         // TODO: Figure out more ideal place to implement
-        List<ITransformer> transformers = finder.findAndCacheTransformers();
+        List<ITransformer> transformers = getTransformers();
         if (!generated) {
             generated = true;
             for (IClassGenerator classGenerator : classGenerators) {
@@ -121,6 +122,10 @@ public class CustomizedClassloader extends URLClassLoader {
 
     private Class<?> defineClass(String name, byte[] bytes) {
         return super.defineClass(name, bytes, 0, bytes.length);
+    }
+
+    public List<ITransformer> getTransformers() {
+        return finder.findAndCacheTransformers();
     }
 
     public static class Builder {

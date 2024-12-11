@@ -6,6 +6,7 @@ import org.mangorage.classloader.features.transformers.TransformStack;
 import java.lang.classfile.ClassFile;
 import java.lang.classfile.ClassModel;
 import java.lang.classfile.ClassTransform;
+import java.lang.classfile.Interfaces;
 import java.lang.constant.ClassDesc;
 
 @SuppressWarnings("preview")

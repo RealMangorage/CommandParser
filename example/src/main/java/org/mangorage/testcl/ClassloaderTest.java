@@ -19,7 +19,6 @@ public class ClassloaderTest {
                 .buildWithBootstrap();
 
         try {
-
             Class.forName(
                     "org.mangorage.testcl.TestingCL",
                     false,
