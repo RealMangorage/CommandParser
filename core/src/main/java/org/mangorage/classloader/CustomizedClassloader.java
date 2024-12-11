@@ -58,11 +58,10 @@ public class CustomizedClassloader extends URLClassLoader {
     }
 
     public byte[] getClassBytes(String className) throws IOException {
-        InputStream is = getResourceAsStream(className.replace('.', '/') + ".class");
-        byte[] buffer = new byte[is.available()];
-        is.read(buffer);
-        is.close();
-        return buffer;
+        try (InputStream is = getResourceAsStream(className.replace('.', '/') + ".class")) {
+            if (is != null) throw new IllegalStateException("Class %s not found".formatted(className));
+            return is.readAllBytes();
+        }
     }
 
     private Class<?> findAndStoreClass(String name) throws ClassNotFoundException {
@@ -73,24 +72,20 @@ public class CustomizedClassloader extends URLClassLoader {
         return clazz;
     }
 
-    public Class<?> tryTransformClass(String name, byte[] original) {
-        try {
-            List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
-                    .filter(t -> t.handlesClass(classFile.parse(original)))
-                    .toList();
+    public Class<?> tryTransformClass(String name, byte[] original) throws ClassNotFoundException {
+        List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
+                .filter(t -> t.handlesClass(classFile.parse(original)))
+                .toList();
 
-            if (transformersRemain.isEmpty())
-                return findAndStoreClass(name);
+        if (transformersRemain.isEmpty())
+            return findAndStoreClass(name);
 
-            TransformStack stack = TransformStack.of(original);
-            transformersRemain.forEach(t -> t.transform(classFile, stack));
+        TransformStack stack = TransformStack.of(original);
+        transformersRemain.forEach(t -> t.transform(classFile, stack));
 
-            Class<?> clazz = defineClass(name, stack.getModifiedOrOriginal());
-            transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
-            return clazz;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        Class<?> clazz = defineClass(name, stack.getModifiedOrOriginal());
+        transformedClassMap.put(name, new TransformedClass(clazz, stack.getHistory()));
+        return clazz;
     }
 
     @Override
@@ -98,11 +93,15 @@ public class CustomizedClassloader extends URLClassLoader {
         // TODO: Figure out more ideal place to implement
         if (!generated) {
             generated = true;
-            classGenerators.forEach(cg -> {
-                var unbaked = cg.generate(classFile);
+            for (IClassGenerator classGenerator : classGenerators) {
+                var unbaked = classGenerator.generate(classFile);
+                /**
+                 * We cant generate classes then define them to then transform them
+                 * So generate -> transform -> definne, instead
+                 */
                 var clz = tryTransformClass(unbaked.name(), unbaked.bytes());
                 System.out.println("Successfully Generated " + clz);
-            });
+            }
         }
 
         System.out.println(name + " -> Customized");
@@ -113,7 +112,7 @@ public class CustomizedClassloader extends URLClassLoader {
 
         try {
             return tryTransformClass(name, getClassBytes(name));
-        } catch (IOException e) {
+        } catch (Throwable e) {
             throw new IllegalStateException("Failed to get Class Bytes for class " + name, e);
         }
     }
@@ -121,7 +120,6 @@ public class CustomizedClassloader extends URLClassLoader {
     private Class<?> defineClass(String name, byte[] bytes) {
         return super.defineClass(name, bytes, 0, bytes.length);
     }
-
 
     public static class Builder {
         private final List<ITransformer> transformers = new ArrayList<>();
