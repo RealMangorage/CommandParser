@@ -6,6 +6,8 @@ import javassist.bytecode.AccessFlag;
 
 import java.io.IOException;
 import java.lang.classfile.ClassFile;
+import java.lang.classfile.ClassModel;
+import java.lang.classfile.Interfaces;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
@@ -28,39 +30,40 @@ public class ClassGen implements IClassGenerator {
                             ),
                             AccessFlag.PUBLIC,
                             mb -> {
+                                mb.withCode(
+                                        cb2 -> {
+                                            cb2.aload(0);
+
+                                            cb2.invokespecial(
+                                                    ConstantDescs.CD_Object,
+                                                    "<init>",
+                                                    MethodTypeDesc.of(
+                                                            ConstantDescs.CD_void
+                                                    )
+                                            );
+
+                                            cb2.return_();
+                                        }
+                                );
+                            }
+                    );
+
+                    cb.withMethod(
+                            "test",
+                            MethodTypeDesc.of(
+                                    ConstantDescs.CD_int,
+                                    ConstantDescs.CD_int
+                            ),
+                            AccessFlag.PUBLIC,
+                            mb -> {
                                 mb.withCode(cb2 -> {
 
                                     // Load 'this' reference
-                                    cb2.aload(0);
 
-                                    // Call superclass constructor
-                                    cb2.invokespecial(
-                                            ConstantDescs.CD_Object,
-                                            "<init>",
-                                            MethodTypeDesc.of(
-                                                    ConstantDescs.CD_void
-                                            )
-                                    );
-                                    cb2.new_(
-                                            ClassDesc.of(
-                                                    "org.mangorage.testcl.TestingCL"
-                                            )
-                                    );
-
-                                    cb2.dup();
-
-                                    cb2.invokespecial(
-                                            ClassDesc.of(
-                                                    "org.mangorage.testcl.TestingCL"
-                                            ),
-                                            "<init>",
-                                            MethodTypeDesc.of(
-                                                    ConstantDescs.CD_void
-                                            )
-                                    );
+                                    cb2.iload(cb2.parameterSlot(0)); // parameter
 
                                     // Return
-                                    cb2.return_();
+                                    cb2.ireturn();
                                 });
                             }
                     );

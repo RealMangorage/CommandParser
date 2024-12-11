@@ -73,29 +73,8 @@ public class CustomizedClassloader extends URLClassLoader {
         return clazz;
     }
 
-    @Override
-    public Class<?> findClass(String name) throws ClassNotFoundException {
-        if (!generated) {
-            generated = true;
-            classGenerators.forEach(cg -> {
-                var unbaked = cg.generate(classFile);
-                var clz = defineClass(unbaked.name(), unbaked.bytes());
-                System.out.println("Successfully Generated " + clz);
-            });
-        }
-
-        System.out.println(name + " -> Customized");
-        if (finder.findAndCacheTransformers().isEmpty())
-            return findAndStoreClass(name);
-        if (transformedClassMap.containsKey(name))
-            return transformedClassMap.get(name).modifiedClass();
-
+    public Class<?> tryTransformClass(String name, byte[] original) {
         try {
-            byte[] original = getClassBytes(name);
-            if (original == null)
-                throw new IllegalStateException("Class Bytes were null for class " + name);
-
-
             List<ITransformer> transformersRemain = finder.findAndCacheTransformers().stream()
                     .filter(t -> t.handlesClass(classFile.parse(original)))
                     .toList();
@@ -112,6 +91,37 @@ public class CustomizedClassloader extends URLClassLoader {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public Class<?> tryTransformClass(String name) {
+        try {
+            byte[] original = getClassBytes(name);
+            if (original == null)
+                throw new IllegalStateException("Class Bytes were null for class " + name);
+            return tryTransformClass(name, original);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public Class<?> findClass(String name) throws ClassNotFoundException {
+        if (!generated) {
+            generated = true;
+            classGenerators.forEach(cg -> {
+                var unbaked = cg.generate(classFile);
+                var clz = tryTransformClass(unbaked.name(), unbaked.bytes());
+                System.out.println("Successfully Generated " + clz);
+            });
+        }
+
+        System.out.println(name + " -> Customized");
+        if (finder.findAndCacheTransformers().isEmpty())
+            return findAndStoreClass(name);
+        if (transformedClassMap.containsKey(name))
+            return transformedClassMap.get(name).modifiedClass();
+
+        return tryTransformClass(name);
     }
 
     private Class<?> defineClass(String name, byte[] bytes) {
