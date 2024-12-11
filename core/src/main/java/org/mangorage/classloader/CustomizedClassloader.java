@@ -93,19 +93,9 @@ public class CustomizedClassloader extends URLClassLoader {
         }
     }
 
-    public Class<?> tryTransformClass(String name) {
-        try {
-            byte[] original = getClassBytes(name);
-            if (original == null)
-                throw new IllegalStateException("Class Bytes were null for class " + name);
-            return tryTransformClass(name, original);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
+        // TODO: Figure out more ideal place to implement
         if (!generated) {
             generated = true;
             classGenerators.forEach(cg -> {
@@ -121,7 +111,11 @@ public class CustomizedClassloader extends URLClassLoader {
         if (transformedClassMap.containsKey(name))
             return transformedClassMap.get(name).modifiedClass();
 
-        return tryTransformClass(name);
+        try {
+            return tryTransformClass(name, getClassBytes(name));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to get Class Bytes for class " + name, e);
+        }
     }
 
     private Class<?> defineClass(String name, byte[] bytes) {
